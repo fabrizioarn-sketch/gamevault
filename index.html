@@ -1,0 +1,2403 @@
+<!DOCTYPE html>
+<html lang="es" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="referrer" content="no-referrer">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="GameVault - Tu tienda líder en venta de consolas de última generación, mandos pro y accesorios gaming con garantía oficial y envío rápido.">
+    <title>GameVault | Consolas, Mandos y Accesorios Gaming</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            neon: '#00f0ff',
+                            purple: '#8a2be2',
+                            pink: '#ff007f'
+                        },
+                        dark: {
+                            bg: '#0a0d14',
+                            card: '#121824',
+                            hover: '#1a2234',
+                            border: '#1f293d'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Orbitron', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@600;800;900&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0a0d14;
+            color: #f3f4f6;
+            overflow-x: hidden;
+        }
+        .font-orbitron {
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        /* Custom Neon Glow Utilities */
+        .glow-neon {
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.35);
+        }
+        .glow-purple {
+            box-shadow: 0 0 20px rgba(138, 43, 226, 0.4);
+        }
+        .glow-pink {
+            box-shadow: 0 0 20px rgba(255, 0, 127, 0.4);
+        }
+        
+        .text-glow-neon {
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.6);
+        }
+        
+        /* Glassmorphism */
+        .glass-panel {
+            background: rgba(18, 24, 36, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0a0d14;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1f293d;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6366f1;
+        }
+        
+        /* Toast notification */
+        #toast {
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        /* ===== Lámpara GameVault ===== */
+        :root { --lamp-a: #00f0ff; --lamp-b: #ff007f; --lamp-rgb: 0, 240, 255; }
+
+        #vault-lamp {
+            position: fixed; z-index: 35; left: 12px; bottom: 16px;
+            display: flex; align-items: center; gap: 10px; padding: 8px 12px;
+            border-radius: 16px; background: rgba(18, 24, 36, 0.88);
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border: 1px solid #1f293d; transition: border-color .4s, box-shadow .4s;
+        }
+        #vault-lamp .lamp-btn { background: none; border: 0; padding: 0; cursor: pointer; border-radius: 12px; }
+        #vault-lamp .lamp-btn:focus-visible, #vault-lamp .chip:focus-visible { outline: 3px solid #f7e600; outline-offset: 3px; }
+        .lamp-body {
+            position: relative; width: 34px; height: 56px; border: 2px solid #2a2640;
+            border-radius: 17px 17px 6px 6px; background: #2a2640; margin-bottom: 8px;
+            transition: background .4s, border-color .4s, box-shadow .4s;
+        }
+        .lamp-body::after { /* base de la lámpara */
+            content: ""; position: absolute; left: 50%; bottom: -9px; width: 60%; height: 6px;
+            transform: translateX(-50%); border-radius: 3px; background: #1f293d;
+        }
+        .lamp-info { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+        .lamp-state { font-family: 'Orbitron', sans-serif; font-size: 10px; font-weight: 800; letter-spacing: .12em; color: #6b7280; }
+        .lamp-chips { display: flex; gap: 6px; }
+        .chip { width: 16px; height: 16px; border-radius: 50%; border: 2px solid rgba(255,255,255,.25); cursor: pointer; padding: 0; }
+        .chip[aria-pressed="true"] { border-color: #fff; }
+        .chip[data-theme="neon"]    { background: linear-gradient(135deg, #00f0ff, #ff007f); }
+        .chip[data-theme="violeta"] { background: linear-gradient(135deg, #8a2be2, #00f0ff); }
+        .chip[data-theme="rosa"]    { background: linear-gradient(135deg, #ff007f, #ffb300); }
+
+        body.vault-on .lamp-body {
+            border-color: var(--lamp-b);
+            background: linear-gradient(var(--lamp-a), var(--lamp-b));
+            box-shadow: 0 0 28px rgba(var(--lamp-rgb), .9), 0 0 70px rgba(var(--lamp-rgb), .45);
+        }
+        body.vault-on #vault-lamp { border-color: rgba(var(--lamp-rgb), .6); box-shadow: 0 0 24px rgba(var(--lamp-rgb), .25); }
+        body.vault-on .lamp-state { color: var(--lamp-a); text-shadow: 0 0 8px var(--lamp-a); }
+        body.vault-flicker .lamp-body { animation: lamp-flicker .6s steps(1, end); }
+        @keyframes lamp-flicker { 0%{opacity:.2} 20%{opacity:1} 35%{opacity:.35} 55%{opacity:1} 70%{opacity:.6} 100%{opacity:1} }
+
+        /* Luz ambiente que sale de la lámpara hacia la tienda */
+        body::before {
+            content: ""; position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: 0;
+            background: radial-gradient(70vw 90vh at 0% 55%, rgba(var(--lamp-rgb), .20), transparent 70%);
+            transition: opacity .6s;
+        }
+        body.vault-on::before { opacity: 1; }
+        body.vault-on #products-grid > div { border-color: rgba(var(--lamp-rgb), .45); box-shadow: 0 0 18px rgba(var(--lamp-rgb), .14); }
+        body.vault-on #hero-img { filter: drop-shadow(0 0 26px rgba(var(--lamp-rgb), .55)); }
+        body.vault-on .font-orbitron .text-brand-neon, body.vault-on h2 .text-brand-neon { text-shadow: 0 0 12px rgba(var(--lamp-rgb), .7); }
+
+        /* Lámpara como barra lateral en pantallas grandes */
+        @media (min-width: 1024px) {
+            body { padding-left: 5.75rem; }
+            #vault-lamp {
+                left: 0; top: 50%; bottom: auto; transform: translateY(-50%);
+                width: 5.75rem; flex-direction: column; gap: 14px; padding: 18px 8px;
+                border-radius: 0 18px 18px 0; border-left: 0;
+            }
+            .lamp-body { width: 56px; height: 104px; border-radius: 28px 28px 8px 8px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            body.vault-flicker .lamp-body { animation: none; }
+            body::before, .lamp-body { transition: none; }
+        }
+
+        /* ===== Barra superior moderna ===== */
+        #hero, #guia, #catalogo, #juegos, #beneficios, #contacto { scroll-margin-top: 84px; }
+        .nav-link {
+            display: inline-flex; align-items: center; gap: 6px; padding: 8px 11px; border-radius: 9999px;
+            color: #d1d5db; transition: color .2s, background .2s, box-shadow .2s; white-space: nowrap;
+        }
+        .nav-link:hover { color: #00f0ff; background: rgba(255,255,255,.06); }
+        .nav-link.active { color: #00f0ff; background: rgba(0,240,255,.12); box-shadow: inset 0 0 0 1px rgba(0,240,255,.35); }
+        .nav-link:focus-visible, .m-link:focus-visible, #volver-inicio:focus-visible { outline: 3px solid #f7e600; outline-offset: 2px; }
+        .m-link {
+            display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 12px;
+            color: #d1d5db; font-weight: 500; transition: background .2s, color .2s;
+        }
+        .m-link:hover, .m-link.active { color: #00f0ff; background: rgba(0,240,255,.08); }
+        #scroll-progress { height: 2px; width: 0; background: linear-gradient(90deg, #00f0ff, #6366f1, #ff007f); }
+
+        /* Sección Juegos */
+        .game-filter {
+            padding: 8px 18px; border-radius: 9999px; font-size: 13px; font-weight: 600; cursor: pointer;
+            border: 1px solid #1f293d; background: #121824; color: #d1d5db; transition: all .2s;
+        }
+        .game-filter:hover { border-color: #00f0ff; color: #fff; }
+        .game-filter.active { background: #6366f1; border-color: #6366f1; color: #fff; }
+        body.vault-on #games-grid > div { border-color: rgba(var(--lamp-rgb), .45); box-shadow: 0 0 18px rgba(var(--lamp-rgb), .14); }
+
+        /* ===== Subpáginas ===== */
+        .pg-hide { display: none !important; }
+        @keyframes pgin { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+        [data-page]:not(.pg-hide) { animation: pgin .35s ease both; }
+        body.vault-on .mini-card { border-color: rgba(var(--lamp-rgb), .45); box-shadow: 0 0 18px rgba(var(--lamp-rgb), .14); }
+        details.faq summary { cursor: pointer; list-style: none; }
+        details.faq summary::-webkit-details-marker { display: none; }
+        details.faq[open] .chev { transform: rotate(180deg); }
+        details.faq .chev { transition: transform .2s; }
+        .step-dot { width: 34px; height: 34px; border-radius: 9999px; display: flex; align-items: center; justify-content: center; font-size: 13px; border: 2px solid #1f293d; background: #121824; color: #6b7280; }
+        .step-dot.done { background: #6366f1; border-color: #6366f1; color: #fff; }
+        @media (prefers-reduced-motion: reduce) { [data-page] { animation: none !important; } }
+
+        /* ===== Métodos de pago ===== */
+        .pay-tile { display:flex; flex-direction:column; align-items:center; gap:4px; padding:10px 4px; border-radius:12px; border:1px solid #1f293d; background:#121824; color:#d1d5db; font-size:11px; font-weight:600; cursor:pointer; transition:all .2s; text-align:center; }
+        .pay-tile i { font-size:18px; }
+        .pay-tile:hover { border-color:#00f0ff; color:#fff; }
+        .pay-tile[aria-checked="true"] { border-color:#00f0ff; background:rgba(0,240,255,.1); color:#fff; box-shadow:0 0 0 1px rgba(0,240,255,.4); }
+        .pay-tile:focus-visible { outline:3px solid #f7e600; outline-offset:2px; }
+
+        /* ===== Reproductor de video ===== */
+        #vp-stage:focus-visible { outline:3px solid #f7e600; outline-offset:3px; }
+        .vp-seg { flex:1; height:8px; border-radius:4px; background:#1f293d; overflow:hidden; cursor:pointer; border:0; padding:0; }
+        .vp-seg i { display:block; height:100%; width:0; background:linear-gradient(90deg,#00f0ff,#6366f1); }
+        .vp-seg:focus-visible, .vp-ctl:focus-visible, .vp-chap:focus-visible { outline:3px solid #f7e600; outline-offset:2px; }
+        .vp-pt { opacity:0; transform:translateX(-14px); animation:vpIn .5s ease forwards; }
+        @keyframes vpIn { to { opacity:1; transform:none; } }
+        .vp-icon { animation:vpFloat 3s ease-in-out infinite; }
+        @keyframes vpFloat { 50% { transform:translateY(-8px); } }
+        .vp-ctl { width:42px; height:42px; border-radius:12px; background:#1a2234; border:1px solid #1f293d; color:#fff; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; transition:all .2s; }
+        .vp-ctl:hover { border-color:#00f0ff; color:#00f0ff; }
+        .vp-chap { width:100%; text-align:left; display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:12px; border:1px solid #1f293d; background:#121824; color:#d1d5db; font-size:13px; cursor:pointer; transition:all .2s; }
+        .vp-chap:hover { border-color:#00f0ff; color:#fff; }
+        .vp-chap[aria-current="true"] { border-color:#00f0ff; background:rgba(0,240,255,.1); color:#fff; }
+        @media (prefers-reduced-motion: reduce) { .vp-pt { animation:none; opacity:1; transform:none; } .vp-icon { animation:none; } }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between antialiased selection:bg-brand-neon selection:text-black">
+
+    <!-- Header / Navbar -->
+    <div class="sticky top-0 z-40 w-full glass-panel border-b border-dark-border">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            
+            <!-- Logo -->
+            <a href="#/inicio" class="flex items-center gap-3 group">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-neon via-brand-500 to-brand-pink flex items-center justify-center p-0.5 group-hover:scale-105 transition-transform duration-300">
+                    <div class="w-full h-full bg-dark-bg rounded-[10px] flex items-center justify-center">
+                        <i class="fa-solid font-bold fa-gamepad text-brand-neon text-xl group-hover:rotate-12 transition-transform"></i>
+                    </div>
+                </div>
+                <span class="font-orbitron text-2xl font-black tracking-wider text-white">
+                    GAME<span class="text-brand-neon">VAULT</span>
+                </span>
+            </a>
+
+            <!-- Navigation Links -->
+            <nav id="main-nav" aria-label="Principal" class="hidden xl:flex items-center gap-1 p-1 rounded-full bg-white/5 border border-dark-border text-sm font-medium">
+                <a href="#/inicio" data-sec="inicio" class="nav-link"><i class="fa-solid fa-house text-xs"></i>Inicio</a>
+                <a href="#catalogo" data-cat="consolas" onclick="goToCategory('consolas'); return false;" class="nav-link"><i class="fa-solid fa-tv text-xs"></i>Consolas</a>
+                <a href="#catalogo" data-cat="mandos" onclick="goToCategory('mandos'); return false;" class="nav-link"><i class="fa-solid fa-gamepad text-xs"></i>Mandos</a>
+                <a href="#/juegos" data-sec="juegos" class="nav-link"><i class="fa-solid fa-compact-disc text-xs"></i>Juegos</a>
+                <a href="#/videos" data-sec="videos" class="nav-link"><i class="fa-solid fa-circle-play text-xs"></i>Videos</a>
+                <a href="#catalogo" data-cat="accesorios" onclick="goToCategory('accesorios'); return false;" class="nav-link"><i class="fa-solid fa-headset text-xs"></i>Accesorios</a>
+                <a href="#/ofertas" data-sec="ofertas" class="nav-link"><i class="fa-solid fa-bolt text-xs"></i>Ofertas</a>
+                <a href="#/garantia" data-sec="garantia" class="nav-link"><i class="fa-solid fa-shield-halved text-xs"></i>Garantía</a>
+                <a href="#/contacto" data-sec="contacto" class="nav-link"><i class="fa-solid fa-envelope text-xs"></i>Contacto</a>
+            </nav>
+
+            <!-- Actions (Cart & Mobile Menu Toggle) -->
+            <div class="flex items-center space-x-4">
+                <button id="cart-toggle-btn" class="relative p-2.5 rounded-xl bg-dark-hover border border-dark-border hover:border-brand-neon text-gray-200 hover:text-white transition-all group">
+                    <i class="fa-solid fa-cart-shopping text-lg group-hover:scale-110 transition-transform"></i>
+                    <span id="cart-count" class="absolute -top-1.5 -right-1.5 bg-brand-pink text-white text-xs font-bold rounded-full h-5.5 min-w-[22px] px-1.5 flex items-center justify-center shadow-lg">0</span>
+                </button>
+
+                <!-- Mobile menu button -->
+                <button id="mobile-menu-btn" class="xl:hidden p-2.5 rounded-xl bg-dark-hover text-gray-300 hover:text-white">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Barra de progreso de lectura -->
+        <div id="scroll-progress" aria-hidden="true"></div>
+
+        <!-- Mobile Navigation Menu -->
+        <div id="mobile-menu" class="hidden xl:hidden glass-panel border-t border-dark-border px-3 pt-3 pb-5 space-y-1">
+            <a href="#/inicio" data-sec="inicio" class="m-link"><i class="fa-solid fa-house w-5 text-center"></i>Inicio</a>
+            <a href="#catalogo" data-cat="consolas" onclick="goToCategory('consolas'); return false;" class="m-link"><i class="fa-solid fa-tv w-5 text-center"></i>Consolas</a>
+            <a href="#catalogo" data-cat="mandos" onclick="goToCategory('mandos'); return false;" class="m-link"><i class="fa-solid fa-gamepad w-5 text-center"></i>Mandos</a>
+            <a href="#/juegos" data-sec="juegos" class="m-link"><i class="fa-solid fa-compact-disc w-5 text-center"></i>Juegos</a>
+            <a href="#/videos" data-sec="videos" class="m-link"><i class="fa-solid fa-circle-play w-5 text-center"></i>Videos</a>
+            <a href="#catalogo" data-cat="accesorios" onclick="goToCategory('accesorios'); return false;" class="m-link"><i class="fa-solid fa-headset w-5 text-center"></i>Accesorios</a>
+            <a href="#/ofertas" data-sec="ofertas" class="m-link"><i class="fa-solid fa-bolt w-5 text-center"></i>Ofertas</a>
+            <a href="#/garantia" data-sec="garantia" class="m-link"><i class="fa-solid fa-shield-halved w-5 text-center"></i>Garantía y envíos</a>
+            <a href="#/contacto" data-sec="contacto" class="m-link"><i class="fa-solid fa-envelope w-5 text-center"></i>Contacto</a>
+        </div>
+    </div>
+
+    <div>
+        <!-- Hero Section -->
+        <div id="hero" data-page="inicio" class="relative min-h-[85vh] flex items-center justify-center pt-8 pb-16 overflow-hidden">
+            <!-- Background Glow Effects -->
+            <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-brand-500/20 rounded-full filter blur-[120px] -z-10 pointer-events-none"></div>
+            <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-brand-pink/20 rounded-full filter blur-[120px] -z-10 pointer-events-none"></div>
+
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                    
+                    <!-- Left Hero Content -->
+                    <div class="lg:col-span-7 space-y-8 text-center lg:text-left">
+                        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-panel border border-brand-neon/30 text-brand-neon text-xs font-semibold uppercase tracking-wider">
+                            <span class="w-2 h-2 rounded-full bg-brand-neon animate-pulse"></span>
+                            Novedad: Edición Pro Limitada
+                        </div>
+
+                        <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight text-white leading-none font-orbitron">
+                            ELEVA TU EXPERIENCIA <br>
+                            <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-neon via-brand-500 to-brand-pink">
+                                DE JUEGO AL LÍMITE
+                            </span>
+                        </h1>
+
+                        <p class="text-lg text-gray-300 max-w-2xl mx-auto lg:mx-0 font-normal">
+                            Consolas de última generación, mandos competitivos de alto rendimiento y accesorios originales con envío inmediato y garantía local oficial.
+                        </p>
+
+                        <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
+                            <a href="#/catalogo" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white font-bold text-base shadow-lg hover:shadow-brand-500/50 transition-all duration-300 flex items-center justify-center gap-2 group">
+                                Ver Catálogo 
+                                <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                            </a>
+                            <a href="#/ofertas" class="w-full sm:w-auto px-8 py-4 rounded-xl glass-panel border border-dark-border hover:border-brand-neon text-gray-200 hover:text-brand-neon font-semibold text-base transition-all duration-300 flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-bolt text-amber-400"></i> Ofertas Especiales
+                            </a>
+                        </div>
+
+                        <!-- Stats -->
+                        <div class="pt-6 grid grid-cols-3 gap-4 border-t border-dark-border/60 max-w-lg mx-auto lg:mx-0">
+                            <div>
+                                <p class="text-2xl font-bold font-orbitron text-white">100%</p>
+                                <p class="text-xs text-gray-400">Originales</p>
+                            </div>
+                            <div>
+                                <p class="text-2xl font-bold font-orbitron text-brand-neon">24/48h</p>
+                                <p class="text-xs text-gray-400">Envío Rápido</p>
+                            </div>
+                            <div>
+                                <p class="text-2xl font-bold font-orbitron text-white">12 M</p>
+                                <p class="text-xs text-gray-400">Garantía Oficial</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Hero Showcase (Console Hero Card) -->
+                    <div class="lg:col-span-5 relative">
+                        <div class="relative glass-panel rounded-3xl p-6 border border-dark-border hover:border-brand-neon/50 transition-all duration-500 group shadow-2xl">
+                            
+                            <!-- Featured Tag -->
+                            <div class="absolute top-4 right-4 bg-brand-pink text-white text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider z-10 shadow-lg">
+                                Top Ventas
+                            </div>
+
+                            <!-- Showcase Image -->
+                            <div class="relative h-72 sm:h-80 w-full flex items-center justify-center my-4 overflow-hidden rounded-2xl bg-dark-bg/50">
+                                <img id="hero-img" src="https://images.unsplash.com/photo-1606813907291-d86efa9b94db?auto=format&fit=crop&w=800&q=80" alt="PlayStation 5 Console" class="object-contain h-full w-full transform group-hover:scale-105 transition-transform duration-500">
+                            </div>
+
+                            <!-- Product Quick Detail -->
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-1 text-amber-400 text-sm">
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <span class="text-gray-400 text-xs ml-2">(4.9 / 5.0)</span>
+                                </div>
+                                <h3 class="text-xl font-bold text-white font-orbitron">PlayStation 5 Slim Edition 1TB</h3>
+                                <p class="text-sm text-gray-400">Incluye mando inalámbrico DualSense y juego astrobot precargado.</p>
+                                
+                                <div class="flex items-center justify-between pt-2">
+                                    <div>
+                                        <span class="text-2xl font-extrabold text-brand-neon font-orbitron">S/ 1,874.90</span>
+                                        <span class="text-sm text-gray-500 line-through ml-2">S/ 2,061.90</span>
+                                    </div>
+                                    <button onclick="addToCart(1)" class="px-5 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-semibold text-sm transition-colors flex items-center gap-2">
+                                        <i class="fa-solid fa-plus"></i> Añadir
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Guía del Catálogo -->
+<div id="guia" data-page="inicio" class="py-12 relative">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="glass-panel rounded-3xl p-6 sm:p-10 border border-dark-border shadow-2xl">
+
+            <div class="text-center space-y-3 mb-8">
+                <h2 class="text-3xl sm:text-4xl font-extrabold font-orbitron text-white">
+                    BIENVENIDO A <span class="text-brand-neon">GAMEVAULT</span>
+                </h2>
+                <p class="text-gray-400 max-w-2xl mx-auto text-sm sm:text-base">
+                    Explora los pilares de nuestra tienda: consolas de última generación, mandos pro y accesorios originales.
+                </p>
+            </div>
+
+            <!-- Contador de usuarios conectados -->
+            <div class="w-full rounded-xl bg-gradient-to-r from-brand-500 to-brand-purple py-4 px-4 text-center font-bold text-white shadow-lg shadow-brand-500/25 flex items-center justify-center gap-3">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                Gamers conectados en GameVault: <span id="online-users" class="font-orbitron text-brand-neon">122</span>
+            </div>
+
+            <!-- Badges de marcas -->
+            <div class="flex flex-wrap justify-center gap-3 mt-5">
+                <span class="px-4 py-2 rounded-lg bg-dark-hover border border-dark-border text-white text-xs font-bold tracking-wide"><i class="fa-brands fa-playstation text-blue-400 mr-1.5"></i>PlayStation</span>
+                <span class="px-4 py-2 rounded-lg bg-dark-hover border border-dark-border text-white text-xs font-bold tracking-wide"><i class="fa-brands fa-xbox text-emerald-400 mr-1.5"></i>Xbox</span>
+                <span class="px-4 py-2 rounded-lg bg-dark-hover border border-dark-border text-white text-xs font-bold tracking-wide"><i class="fa-solid fa-gamepad text-red-400 mr-1.5"></i>Nintendo</span>
+            </div>
+
+            <!-- Guía por categorías -->
+            <div class="mt-8 rounded-2xl bg-dark-bg/60 border border-dark-border p-5 sm:p-6">
+                <h3 class="text-center text-xl font-bold font-orbitron text-white mb-5">Guía del Catálogo</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <h4 class="text-brand-neon font-bold text-base pb-2 mb-3 border-b border-dark-border">Módulo Consolas</h4>
+                        <ul id="guide-consolas" class="space-y-2"></ul>
+                    </div>
+                    <div>
+                        <h4 class="text-brand-neon font-bold text-base pb-2 mb-3 border-b border-dark-border">Módulo Mandos</h4>
+                        <ul id="guide-mandos" class="space-y-2"></ul>
+                    </div>
+                    <div>
+                        <h4 class="text-brand-neon font-bold text-base pb-2 mb-3 border-b border-dark-border">Módulo Accesorios</h4>
+                        <ul id="guide-accesorios" class="space-y-2 max-h-80 overflow-y-auto pr-1"></ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Estadísticas -->
+            <div class="mt-8 pt-6 border-t border-dark-border grid grid-cols-3 gap-4 text-center">
+                <div>
+                    <p id="stat-consolas" class="text-3xl font-bold font-orbitron text-white">0</p>
+                    <p class="text-xs sm:text-sm text-gray-400">Consolas</p>
+                </div>
+                <div>
+                    <p id="stat-mandos" class="text-3xl font-bold font-orbitron text-brand-neon">0</p>
+                    <p class="text-xs sm:text-sm text-gray-400">Mandos</p>
+                </div>
+                <div>
+                    <p id="stat-total" class="text-3xl font-bold font-orbitron text-white">0</p>
+                    <p class="text-xs sm:text-sm text-gray-400">Total Productos</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+        <!-- Teaser: guía en video -->
+        <div id="video-teaser" data-page="inicio" class="py-6">
+            <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+                <a href="#/videos" class="group glass-panel rounded-3xl border border-dark-border hover:border-brand-neon/60 transition-all p-6 sm:p-8 flex flex-col sm:flex-row items-center gap-6">
+                    <span class="w-20 h-20 shrink-0 rounded-full bg-gradient-to-tr from-brand-500 to-brand-neon flex items-center justify-center text-white text-3xl group-hover:scale-110 transition-transform"><i class="fa-solid fa-play ml-1"></i></span>
+                    <span class="text-center sm:text-left">
+                        <span class="block text-xs font-bold uppercase tracking-widest text-brand-neon mb-1">Nuevo · Guía en video</span>
+                        <span class="block font-orbitron text-xl sm:text-2xl font-black text-white">¿Qué consola o mando te conviene?</span>
+                        <span class="block text-sm text-gray-400 mt-1">9 capítulos con las consolas, mandos y accesorios que encuentras en GameVault. Con subtítulos y narración opcional.</span>
+                    </span>
+                    <span class="sm:ml-auto px-5 py-3 rounded-xl bg-brand-500 group-hover:bg-brand-600 text-white font-semibold text-sm whitespace-nowrap">Ver video <i class="fa-solid fa-arrow-right ml-1"></i></span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Catalog Section -->
+        <div id="catalogo" data-page="catalogo" class="py-16 bg-dark-bg relative">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                
+                <!-- Section Header -->
+                <div class="text-center space-y-4 mb-12">
+                    <h2 class="text-3xl sm:text-5xl font-extrabold font-orbitron text-white">
+                        NUESTRO <span class="text-brand-neon">CATÁLOGO</span>
+                    </h2>
+                    <p class="text-gray-400 max-w-xl mx-auto">
+                        Explora nuestra selección premium de consolas de última generación, mandos pro personalizables y accesorios gaming esenciales.
+                    </p>
+
+                    <!-- Category Filters -->
+                    <div class="flex flex-wrap justify-center gap-3 pt-6" id="filter-buttons">
+                        <button onclick="filterProducts('all')" class="filter-btn active px-6 py-2.5 rounded-xl text-sm font-semibold border transition-all duration-200 bg-brand-500 border-brand-500 text-white shadow-lg shadow-brand-500/20">
+                            Todos los Productos
+                        </button>
+                        <button onclick="filterProducts('consolas')" class="filter-btn px-6 py-2.5 rounded-xl text-sm font-semibold border border-dark-border bg-dark-card hover:border-brand-neon text-gray-300 hover:text-white transition-all duration-200">
+                            <i class="fa-solid fa-gamepad mr-2"></i>Consolas
+                        </button>
+                        <button onclick="filterProducts('mandos')" class="filter-btn px-6 py-2.5 rounded-xl text-sm font-semibold border border-dark-border bg-dark-card hover:border-brand-neon text-gray-300 hover:text-white transition-all duration-200">
+                            <i class="fa-solid fa-headset mr-2"></i>Mandos & Controllers
+                        </button>
+                        <button onclick="filterProducts('accesorios')" class="filter-btn px-6 py-2.5 rounded-xl text-sm font-semibold border border-dark-border bg-dark-card hover:border-brand-neon text-gray-300 hover:text-white transition-all duration-200">
+                            <i class="fa-solid fa-plug mr-2"></i>Accesorios
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Buscador, orden y stock -->
+                <div class="flex flex-col lg:flex-row gap-3 lg:items-center mb-6 glass-panel rounded-2xl p-4 border border-dark-border">
+                    <div class="relative flex-1">
+                        <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                        <input id="buscar" type="search" oninput="refreshCatalog()" placeholder="Buscar consola, mando o accesorio..." aria-label="Buscar productos" class="w-full pl-11 pr-4 py-2.5 rounded-xl bg-dark-bg border border-dark-border text-white text-sm placeholder-gray-500 focus:outline-none focus:border-brand-neon">
+                    </div>
+                    <select id="orden" onchange="refreshCatalog()" aria-label="Ordenar productos" class="px-4 py-2.5 rounded-xl bg-dark-bg border border-dark-border text-white text-sm focus:outline-none focus:border-brand-neon">
+                        <option value="">Ordenar: Destacados</option>
+                        <option value="asc">Precio: menor a mayor</option>
+                        <option value="desc">Precio: mayor a menor</option>
+                        <option value="dto">Mayor descuento</option>
+                    </select>
+                    <label class="flex items-center gap-2 text-sm text-gray-300 cursor-pointer select-none">
+                        <input id="solo-stock" type="checkbox" onchange="refreshCatalog()" class="accent-indigo-500 w-4 h-4"> Solo con stock
+                    </label>
+                    <span id="result-count" class="text-xs text-gray-400 whitespace-nowrap" aria-live="polite"></span>
+                </div>
+
+                <!-- Products Grid -->
+                <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    <!-- Products will be dynamically populated via JS -->
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Juegos Section -->
+        <div id="juegos" data-page="juegos" class="py-16 relative border-t border-dark-border">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center space-y-4 mb-10">
+                    <h2 class="text-3xl sm:text-5xl font-extrabold font-orbitron text-white">
+                        JUEGOS PARA <span class="text-brand-neon">TU CONSOLA</span>
+                    </h2>
+                    <p class="text-gray-400 max-w-xl mx-auto">Elige tu plataforma y encuentra los títulos más jugados, con juego original y entrega rápida.</p>
+                    <div id="game-filters" class="flex flex-wrap justify-center gap-3 pt-4" role="group" aria-label="Filtrar juegos por plataforma">
+                        <button type="button" class="game-filter active" data-platform="all">Todos</button>
+                        <button type="button" class="game-filter" data-platform="PS5"><i class="fa-brands fa-playstation mr-1.5"></i>PlayStation</button>
+                        <button type="button" class="game-filter" data-platform="Xbox"><i class="fa-brands fa-xbox mr-1.5"></i>Xbox</button>
+                        <button type="button" class="game-filter" data-platform="Switch"><i class="fa-solid fa-gamepad mr-1.5"></i>Nintendo Switch</button>
+                    </div>
+                </div>
+                <div id="games-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6"></div>
+            </div>
+        </div>
+
+        <!-- Benefits & Features Section -->
+        <div id="beneficios" data-page="inicio" class="py-16 relative border-t border-b border-dark-border bg-dark-card/30">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    
+                    <!-- Benefit 1 -->
+                    <div class="glass-panel p-6 rounded-2xl border border-dark-border hover:border-brand-neon/50 transition-all duration-300 flex flex-col items-center text-center group">
+                        <div class="w-14 h-14 rounded-2xl bg-brand-neon/10 border border-brand-neon/30 flex items-center justify-center text-brand-neon text-2xl mb-4 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-truck-fast"></i>
+                        </div>
+                        <h4 class="text-lg font-bold text-white mb-2 font-orbitron">Envíos Rápidos</h4>
+                        <p class="text-sm text-gray-400">Entregas seguras y aseguradas a todo el país en 24 a 48 horas laborables.</p>
+                    </div>
+
+                    <!-- Benefit 2 -->
+                    <div class="glass-panel p-6 rounded-2xl border border-dark-border hover:border-brand-purple/50 transition-all duration-300 flex flex-col items-center text-center group">
+                        <div class="w-14 h-14 rounded-2xl bg-brand-purple/10 border border-brand-purple/30 flex items-center justify-center text-brand-purple text-2xl mb-4 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-shield-halved"></i>
+                        </div>
+                        <h4 class="text-lg font-bold text-white mb-2 font-orbitron">Garantía Oficial</h4>
+                        <p class="text-sm text-gray-400">12 meses de garantía directa de fabricante en todas tus consolas y periféricos.</p>
+                    </div>
+
+                    <!-- Benefit 3 -->
+                    <div class="glass-panel p-6 rounded-2xl border border-dark-border hover:border-brand-pink/50 transition-all duration-300 flex flex-col items-center text-center group">
+                        <div class="w-14 h-14 rounded-2xl bg-brand-pink/10 border border-brand-pink/30 flex items-center justify-center text-brand-pink text-2xl mb-4 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-credit-card"></i>
+                        </div>
+                        <h4 class="text-lg font-bold text-white mb-2 font-orbitron">Pago Seguro</h4>
+                        <p class="text-sm text-gray-400">Múltiples métodos de pago, tarjetas de crédito y hasta 12 cuotas sin interés.</p>
+                    </div>
+
+                    <!-- Benefit 4 -->
+                    <div class="glass-panel p-6 rounded-2xl border border-dark-border hover:border-brand-neon/50 transition-all duration-300 flex flex-col items-center text-center group">
+                        <div class="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 text-2xl mb-4 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-headset"></i>
+                        </div>
+                        <h4 class="text-lg font-bold text-white mb-2 font-orbitron">Soporte 24/7</h4>
+                        <p class="text-sm text-gray-400">Asesoramiento gamer personalizado para resolver todas tus dudas antes y después de comprar.</p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <style>
+    .gv-promo {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+    }
+    .gv-promo * { box-sizing: border-box; }
+
+    .gv-promo .container {
+        background: white;
+        border-radius: 15px;
+        padding: 40px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        text-align: center;
+        max-width: 600px;
+        width: 100%;
+    }
+    .gv-promo .logo {
+        width: 80px;
+        height: 80px;
+        background: #667eea;
+        border-radius: 50%;
+        margin: 0 auto 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 24px;
+        font-weight: bold;
+    }
+    .gv-promo h1 { color: #333; font-size: 2em; font-weight: bold; margin-bottom: 10px; }
+    .gv-promo .subtitle { color: #666; font-size: 1.1em; margin-bottom: 30px; }
+    .gv-promo .message-box {
+        background: #667eea;
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        margin: 20px 0;
+        transition: background 0.5s;
+    }
+    .gv-promo #gv-text { font-size: 1.5em; font-weight: bold; margin: 10px 0; }
+    .gv-promo .buttons {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin: 20px 0;
+    }
+    .gv-promo .buttons button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        background: #667eea;
+        color: white;
+        font-size: 14px;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+    .gv-promo .buttons button:hover { background: #5a6fd8; }
+    .gv-promo .stats { display: flex; justify-content: space-around; margin: 30px 0; }
+    .gv-promo .stat { text-align: center; }
+    .gv-promo .stat-number { font-size: 1.8em; font-weight: bold; color: #667eea; }
+    .gv-promo .stat-label { color: #666; font-size: 0.9em; }
+    .gv-promo .features {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        margin: 20px 0;
+    }
+    .gv-promo .feature { padding: 15px; background: #f8f9fa; border-radius: 8px; color: #333; }
+    .gv-promo .feature p { color: #666; font-size: 0.9em; }
+    .gv-promo .footer { margin-top: 30px; color: #888; font-size: 0.9em; }
+
+    @media (max-width: 560px) {
+        .gv-promo .features { grid-template-columns: 1fr; }
+    }
+</style>
+
+<section class="gv-promo" data-page="inicio">
+    <div class="container">
+        <div class="logo">GV</div>
+        <h1>GameVault - Tu Mundo Gamer</h1>
+        <p class="subtitle">Consolas, Mandos y Accesorios Originales</p>
+
+        <div class="message-box">
+            <p id="gv-text">¡Bienvenido a GameVault, gamer!</p>
+        </div>
+
+        <div class="buttons">
+            <button onclick="document.getElementById('gv-text').innerHTML = '🎮 PS5 Slim desde S/ 1,874.90'">
+                PlayStation
+            </button>
+            <button onclick="document.getElementById('gv-text').innerHTML = '🟢 Xbox Series X con garantía oficial'">
+                Xbox
+            </button>
+            <button onclick="document.getElementById('gv-text').innerHTML = '🔴 Nintendo Switch OLED en stock'">
+                Nintendo
+            </button>
+        </div>
+
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-number">1000+</div>
+                <div class="stat-label">Consolas Vendidas</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">500+</div>
+                <div class="stat-label">Gamers Felices</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">12</div>
+                <div class="stat-label">Meses de Garantía</div>
+            </div>
+        </div>
+
+        <div class="features">
+            <div class="feature">
+                <strong>🛡️ Garantía Oficial</strong>
+                <p>Productos 100% originales</p>
+            </div>
+            <div class="feature">
+                <strong>🚚 Envío Rápido</strong>
+                <p>Entrega en 24 a 48 horas</p>
+            </div>
+            <div class="feature">
+                <strong>🎧 Soporte 24/7</strong>
+                <p>Asesoría gamer personalizada</p>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>© 2026 GameVault - Todos los derechos reservados</p>
+        </div>
+    </div>
+</section>
+
+<script>
+    (function () {
+        var textEl = document.getElementById('gv-text');
+        var box = document.querySelector('.gv-promo .message-box');
+
+        textEl.innerHTML = '¡Bienvenido a GameVault, gamer!';
+
+        // Cambio de color del recuadro cada 3 segundos
+        setInterval(function () {
+            var colors = ['#667eea', '#764ba2', '#ff6b6b', '#4ecdc4'];
+            box.style.background = colors[Math.floor(Math.random() * colors.length)];
+        }, 3000);
+
+        // Contador simple de visitas
+        var count = 0;
+        setInterval(function () {
+            count++;
+            textEl.innerHTML = '¡Bienvenido a GameVault! Visitas: ' + count;
+        }, 5000);
+    })();
+</script>
+<style>
+.gv-promo .container{background:#121824;border:1px solid #1f293d;box-shadow:none}
+.gv-promo h1,.gv-promo .feature strong{color:#fff}
+.gv-promo .subtitle,.gv-promo .stat-label,.gv-promo .feature p,.gv-promo .footer{color:#9ca3af}
+.gv-promo .feature{background:#1a2234}
+.gv-promo .stat-number{color:#00f0ff}
+</style>
+
+        <!-- Order / Contact Form Section -->
+        <div id="contacto" data-page="contacto" class="py-20 relative">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="glass-panel rounded-3xl p-8 sm:p-12 border border-dark-border shadow-2xl relative overflow-hidden">
+                    
+                    <div class="text-center space-y-3 mb-8">
+                        <h2 class="text-3xl font-extrabold font-orbitron text-white">
+                            ¿BUSCAS ALGO <span class="text-brand-neon">ESPECIAL?</span>
+                        </h2>
+                        <p class="text-gray-400 text-sm sm:text-base">
+                            Solicita una cotización rápida para bundles personalizados, consolas en edición especial o mandos Pro Custom.
+                        </p>
+                    </div>
+
+                    <form id="custom-order-form" onsubmit="handleFormSubmit(event)" class="space-y-6">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            
+                            <!-- Name -->
+                            <div>
+                                <label for="name" class="block text-xs font-semibold text-gray-300 uppercase mb-2">Nombre Completo</label>
+                                <input type="text" id="name" required placeholder="Ej. Alex Turner" class="w-full px-4 py-3 rounded-xl bg-dark-bg border border-dark-border text-white placeholder-gray-500 focus:outline-none focus:border-brand-neon transition-colors">
+                            </div>
+
+                            <!-- Email -->
+                            <div>
+                                <label for="email" class="block text-xs font-semibold text-gray-300 uppercase mb-2">Correo Electrónico</label>
+                                <input type="email" id="email" required placeholder="tuemail@gamer.com" class="w-full px-4 py-3 rounded-xl bg-dark-bg border border-dark-border text-white placeholder-gray-500 focus:outline-none focus:border-brand-neon transition-colors">
+                            </div>
+
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            
+                            <!-- Product Interest -->
+                            <div>
+                                <label for="product-interest" class="block text-xs font-semibold text-gray-300 uppercase mb-2">Producto de Interés</label>
+                                <select id="product-interest" class="w-full px-4 py-3 rounded-xl bg-dark-bg border border-dark-border text-white focus:outline-none focus:border-brand-neon transition-colors">
+                                    <option value="ps5">PlayStation 5 / DualSense</option>
+                                    <option value="xbox">Xbox Series X|S / Elite Controller</option>
+                                    <option value="switch">Nintendo Switch OLED / Pro Controller</option>
+                                    <option value="custom">Mando Custom / Modificado</option>
+                                    <option value="otro">Otro / Consulta General</option>
+                                </select>
+                            </div>
+
+                            <!-- Phone/WhatsApp -->
+                            <div>
+                                <label for="phone" class="block text-xs font-semibold text-gray-300 uppercase mb-2">Teléfono / WhatsApp</label>
+                                <input type="tel" id="phone" placeholder="+51 987 654 321" class="w-full px-4 py-3 rounded-xl bg-dark-bg border border-dark-border text-white placeholder-gray-500 focus:outline-none focus:border-brand-neon transition-colors">
+                            </div>
+
+                        </div>
+
+                        <!-- Message -->
+                        <div>
+                            <label for="message" class="block text-xs font-semibold text-gray-300 uppercase mb-2">Detalles del Pedido o Dirección de Envío</label>
+                            <textarea id="message" rows="4" required placeholder="Indícanos si deseas incluir juegos adicionales, accesorios o especificaciones de entrega..." class="w-full px-4 py-3 rounded-xl bg-dark-bg border border-dark-border text-white placeholder-gray-500 focus:outline-none focus:border-brand-neon transition-colors"></textarea>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="w-full py-4 rounded-xl bg-gradient-to-r from-brand-neon via-brand-500 to-brand-purple text-white font-extrabold font-orbitron tracking-wider hover:opacity-95 transition-opacity shadow-lg shadow-brand-500/25 flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-paper-plane"></i> ENVIAR SOLICITUD DE PEDIDO
+                        </button>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!-- ===== SUBPÁGINA: Ofertas ===== -->
+        <div id="pg-ofertas" data-page="ofertas" class="py-16 relative">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center space-y-4 mb-10">
+                    <h2 class="text-3xl sm:text-5xl font-extrabold font-orbitron text-white">OFERTAS <span class="text-brand-neon">ESPECIALES</span></h2>
+                    <p class="text-gray-400 max-w-xl mx-auto">Los mayores descuentos del momento. Stock limitado: cuando se acaban, se acaban.</p>
+                    <div class="inline-flex items-center gap-3 px-5 py-3 rounded-2xl glass-panel border border-brand-pink/40 text-sm">
+                        <i class="fa-solid fa-stopwatch text-brand-pink"></i> Las ofertas del día terminan en
+                        <span id="oferta-timer" class="font-orbitron font-bold text-brand-neon">--:--:--</span>
+                    </div>
+                </div>
+                <div id="ofertas-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
+            </div>
+        </div>
+
+        <!-- ===== SUBPÁGINA: Garantía y envíos ===== -->
+        <div id="pg-garantia" data-page="garantia" class="py-16 relative">
+            <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center space-y-4 mb-10">
+                    <h2 class="text-3xl sm:text-5xl font-extrabold font-orbitron text-white">GARANTÍA <span class="text-brand-neon">Y ENVÍOS</span></h2>
+                    <p class="text-gray-400 max-w-xl mx-auto">Todo lo que necesitas saber antes y después de tu compra.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="glass-panel rounded-2xl p-6 border border-dark-border">
+                        <h3 class="font-orbitron font-bold text-white mb-2"><i class="fa-solid fa-shield-halved text-brand-purple mr-2"></i>Garantía oficial de 12 meses</h3>
+                        <p class="text-sm text-gray-400">Todas las consolas y periféricos cuentan con 12 meses de garantía directa de fabricante. Cubre defectos de fábrica; no cubre golpes, líquidos ni uso indebido. Conserva tu código de pedido GV-XXXXXX como comprobante.</p>
+                    </div>
+                    <div class="glass-panel rounded-2xl p-6 border border-dark-border">
+                        <h3 class="font-orbitron font-bold text-white mb-2"><i class="fa-solid fa-truck-fast text-brand-neon mr-2"></i>Envíos a todo el país</h3>
+                        <p class="text-sm text-gray-400">Entregas aseguradas en 24 a 48 horas laborables. El envío estándar es gratuito. Puedes seguir tu pedido en la sección <a href="#/pedido" class="text-brand-neon hover:underline">Estado de mi pedido</a>.</p>
+                    </div>
+                    <div class="glass-panel rounded-2xl p-6 border border-dark-border">
+                        <h3 class="font-orbitron font-bold text-white mb-2"><i class="fa-solid fa-rotate-left text-brand-pink mr-2"></i>Cambios y devoluciones</h3>
+                        <p class="text-sm text-gray-400">Si tu producto llega con fallas o no es el que pediste, solicita el cambio dentro de los primeros 7 días con el producto y sus accesorios en su empaque original.</p>
+                    </div>
+                    <div class="glass-panel rounded-2xl p-6 border border-dark-border">
+                        <h3 class="font-orbitron font-bold text-white mb-2"><i class="fa-solid fa-boxes-stacked text-amber-400 mr-2"></i>Stock y límite de compra</h3>
+                        <p class="text-sm text-gray-400">Trabajamos con stock limitado y real. Para que más gamers puedan comprar, hay un máximo de 5 unidades por producto en cada pedido (o el stock disponible si es menor).</p>
+                    </div>
+                </div>
+                <div class="text-center mt-8"><a href="#/faq" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-semibold text-sm transition-colors"><i class="fa-solid fa-circle-question"></i> Ver preguntas frecuentes</a></div>
+            </div>
+        </div>
+
+        <!-- ===== SUBPÁGINA: FAQ ===== -->
+        <div id="pg-faq" data-page="faq" class="py-16 relative">
+            <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center space-y-4 mb-10">
+                    <h2 class="text-3xl sm:text-5xl font-extrabold font-orbitron text-white">CENTRO DE <span class="text-brand-neon">AYUDA</span></h2>
+                    <p class="text-gray-400">Preguntas frecuentes sobre compras, stock, pagos y garantía.</p>
+                </div>
+                <div class="space-y-3" id="faq-list"></div>
+                <p class="text-center text-sm text-gray-400 mt-8">¿No encontraste tu respuesta? <a href="#/contacto" class="text-brand-neon hover:underline">Escríbenos</a>.</p>
+            </div>
+        </div>
+
+        <!-- ===== SUBPÁGINA: Estado de pedido ===== -->
+        <div id="pg-pedido" data-page="pedido" class="py-16 relative">
+            <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center space-y-4 mb-8">
+                    <h2 class="text-3xl sm:text-5xl font-extrabold font-orbitron text-white">ESTADO DE <span class="text-brand-neon">MI PEDIDO</span></h2>
+                    <p class="text-gray-400">Ingresa tu código (ej. GV-A1B2C3) o revisa tus compras recientes.</p>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-3 mb-6">
+                    <input id="pedido-code" type="text" placeholder="GV-XXXXXX" aria-label="Código de pedido" onkeydown="if(event.key==='Enter')buscarPedido()" class="flex-1 px-4 py-3 rounded-xl bg-dark-bg border border-dark-border text-white uppercase placeholder-gray-500 focus:outline-none focus:border-brand-neon">
+                    <button type="button" onclick="buscarPedido()" class="px-6 py-3 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-semibold text-sm"><i class="fa-solid fa-magnifying-glass mr-2"></i>Buscar</button>
+                </div>
+                <div id="pedido-result" class="space-y-4" aria-live="polite"></div>
+            </div>
+        </div>
+
+        <!-- ===== SUBPÁGINA: Videos ===== -->
+        <div id="pg-videos" data-page="videos" class="py-16 relative">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center space-y-4 mb-10">
+                    <h2 class="text-3xl sm:text-5xl font-extrabold font-orbitron text-white">GUÍA EN <span class="text-brand-neon">VIDEO</span></h2>
+                    <p class="text-gray-400 max-w-2xl mx-auto">Conoce las consolas y mandos que encuentras en GameVault: qué ofrece cada uno y para quién es ideal.</p>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2 glass-panel rounded-3xl border border-dark-border overflow-hidden">
+                        <div id="vp-stage" tabindex="0" aria-label="Reproductor de la guía GameVault. Barra espaciadora para pausar, flechas para cambiar de capítulo." class="relative min-h-[430px] sm:min-h-0 sm:aspect-video overflow-hidden">
+                            <div id="vp-scene" class="absolute inset-0 flex flex-col sm:grid sm:grid-cols-5 items-center justify-center gap-4 p-6 sm:p-10"></div>
+                            <button type="button" id="vp-big" aria-label="Reproducir video" class="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-dark-bg/80 backdrop-blur-sm text-white">
+                                <span class="w-20 h-20 rounded-full bg-gradient-to-tr from-brand-500 to-brand-neon flex items-center justify-center text-3xl shadow-lg"><i id="vp-big-ic" class="fa-solid fa-play ml-1"></i></span>
+                                <span id="vp-big-tx" class="font-orbitron font-bold tracking-wider">VER GUÍA</span>
+                            </button>
+                        </div>
+                        <div class="px-5 pt-4"><div id="vp-segs" class="flex gap-1" role="group" aria-label="Progreso por capítulo"></div></div>
+                        <div class="flex flex-wrap items-center gap-3 px-5 py-4">
+                            <button type="button" id="vp-prev" class="vp-ctl" aria-label="Capítulo anterior"><i class="fa-solid fa-backward-step"></i></button>
+                            <button type="button" id="vp-play" class="vp-ctl" aria-label="Reproducir"><i class="fa-solid fa-play"></i></button>
+                            <button type="button" id="vp-next" class="vp-ctl" aria-label="Capítulo siguiente"><i class="fa-solid fa-forward-step"></i></button>
+                            <span id="vp-label" class="text-xs text-gray-400 flex-1 min-w-[120px]" aria-live="polite"></span>
+                            <button type="button" id="vp-voz" aria-pressed="false" class="px-3 py-2 rounded-xl bg-dark-hover border border-dark-border text-xs font-semibold text-gray-200 hover:border-brand-neon transition-colors"><i class="fa-solid fa-volume-xmark mr-1.5"></i>Narración: no</button>
+                        </div>
+                    </div>
+                    <div class="glass-panel rounded-3xl border border-dark-border p-5">
+                        <h3 class="font-orbitron font-bold text-white mb-4">Capítulos</h3>
+                        <div id="vp-chaps" class="space-y-2"></div>
+                    </div>
+                </div>
+
+                <!-- Videos de YouTube (opcional): se llenan desde VIDEOS_YT en el script -->
+                <div id="yt-extra" class="mt-14 hidden">
+                    <h3 class="text-xl font-bold font-orbitron text-white mb-5">Más videos recomendados</h3>
+                    <div id="yt-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== SUBPÁGINA: Detalle de producto ===== -->
+        <div id="pg-producto" data-page="producto" class="py-12 relative">
+            <div id="detalle" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8"></div>
+        </div>
+
+    </div>
+
+    <!-- Shopping Cart Slide-over Drawer -->
+    <div id="cart-drawer" class="fixed inset-0 z-50 overflow-hidden pointer-events-none transition-opacity duration-300 opacity-0">
+        <!-- Backdrop -->
+        <div id="cart-backdrop" onclick="toggleCart()" class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
+
+        <div class="fixed inset-y-0 right-0 max-w-full flex pl-10">
+            <div id="cart-panel" class="w-screen max-w-md glass-panel border-l border-dark-border bg-dark-bg flex flex-col justify-between transform translate-x-full transition-transform duration-300 ease-in-out pointer-events-auto">
+                
+                <!-- Drawer Header -->
+                <div class="p-6 border-b border-dark-border flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-cart-shopping text-brand-neon text-xl"></i>
+                        <h3 class="text-xl font-bold font-orbitron text-white">Tu Carrito</h3>
+                    </div>
+                    <button onclick="toggleCart()" class="text-gray-400 hover:text-white p-2 rounded-lg hover:bg-dark-hover">
+                        <i class="fa-solid fa-xmark text-xl"></i>
+                    </button>
+                </div>
+
+                <!-- Drawer Body / Item List -->
+                <div id="cart-items-container" class="p-6 overflow-y-auto flex-1 min-h-0 space-y-4">
+                    <!-- Cart items rendered dynamically -->
+                </div>
+
+                <!-- Drawer Footer / Summary -->
+                <div class="p-6 border-t border-dark-border bg-dark-card/50 space-y-4">
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-sm text-gray-400">
+                            <span>Subtotal</span>
+                            <span id="cart-subtotal" class="font-semibold text-white">S/ 0.00</span>
+                        </div>
+                        <div class="flex justify-between text-sm text-gray-400">
+                            <span>Envío Estándar</span>
+                            <span class="text-emerald-400 font-semibold">¡GRATIS!</span>
+                        </div>
+                        <div class="flex justify-between text-lg font-bold text-white pt-2 border-t border-dark-border">
+                            <span>Total</span>
+                            <span id="cart-total" class="text-brand-neon font-orbitron">S/ 0.00</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <p class="text-xs font-semibold text-gray-300 uppercase mb-2">Método de pago</p>
+                        <div class="pay-grid grid grid-cols-3 gap-2" role="radiogroup" aria-label="Método de pago"></div>
+                        <p id="pay-hint" class="text-[11px] text-gray-500 mt-2 min-h-[28px]"></p>
+                    </div>
+
+                    <button onclick="openCheckoutModal()" id="checkout-btn" class="w-full py-3.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold font-orbitron tracking-wider transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                        PROCEDER AL PAGO
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Checkout Modal (se construye por JS según el método de pago) -->
+    <div id="checkout-modal" class="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="co-title">
+        <div class="glass-panel w-full max-w-2xl rounded-3xl border border-dark-border p-6 sm:p-8 relative my-auto">
+            <button type="button" onclick="closeCheckoutModal()" aria-label="Cerrar" class="absolute top-4 right-4 text-gray-400 hover:text-white p-2">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            <div id="checkout-body"></div>
+        </div>
+    </div>
+
+    <!-- Lámpara GameVault (barra lateral) -->
+    <aside id="vault-lamp" aria-label="Lámpara gamer">
+        <button id="lamp-btn" class="lamp-btn" type="button" aria-pressed="false" aria-label="Encender lámpara (tecla L)" title="Encender / apagar (tecla L)">
+            <div class="lamp-body" aria-hidden="true"></div>
+        </button>
+        <div class="lamp-info">
+            <span id="lamp-state" class="lamp-state">APAGADA</span>
+            <div class="lamp-chips" role="group" aria-label="Color de la lámpara">
+                <button class="chip" type="button" data-theme="neon" aria-pressed="true" aria-label="Color neón"></button>
+                <button class="chip" type="button" data-theme="violeta" aria-pressed="false" aria-label="Color violeta"></button>
+                <button class="chip" type="button" data-theme="rosa" aria-pressed="false" aria-label="Color rosa"></button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 glass-panel border border-brand-neon/40 px-5 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 transform translate-y-24 opacity-0 pointer-events-none">
+        <i class="fa-solid fa-circle-check text-brand-neon text-lg"></i>
+        <span id="toast-message" class="text-sm font-medium text-white">Producto agregado al carrito</span>
+    </div>
+
+    <!-- Footer -->
+    <div class="bg-dark-bg border-t border-dark-border pt-16 pb-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 rounded-2xl glass-panel border border-dark-border px-6 py-5 mb-12">
+                <p class="text-sm text-gray-300">¿Ya exploraste todo? Vuelve al inicio para ver las novedades.</p>
+                <a id="volver-inicio" href="#/inicio" onclick="volverInicio(); return false;" class="px-6 py-3 rounded-xl bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white font-bold text-sm shadow-lg transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-arrow-up"></i> Volver a la página principal
+                </a>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-12 border-b border-dark-border/60">
+                
+                <!-- Col 1: Brand Info -->
+                <div class="lg:col-span-2 space-y-4">
+                    <a href="#/inicio" class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-brand-neon to-brand-pink flex items-center justify-center p-0.5">
+                            <div class="w-full h-full bg-dark-bg rounded-[6px] flex items-center justify-center">
+                                <i class="fa-solid fa-gamepad text-brand-neon text-base"></i>
+                            </div>
+                        </div>
+                        <span class="font-orbitron text-xl font-black text-white">
+                            GAME<span class="text-brand-neon">VAULT</span>
+                        </span>
+                    </a>
+                    <p class="text-sm text-gray-400 max-w-sm">
+                        Tu destino gamer definitivo. Especialistas en consolas PlayStation, Xbox y Nintendo Switch, así como en mandos pro de nivel competitivo.
+                    </p>
+                    <div class="flex space-x-4 pt-2">
+                        <a href="#" class="w-9 h-9 rounded-xl bg-dark-card border border-dark-border hover:border-brand-neon flex items-center justify-center text-gray-400 hover:text-brand-neon transition-colors">
+                            <i class="fa-brands fa-discord"></i>
+                        </a>
+                        <a href="#" class="w-9 h-9 rounded-xl bg-dark-card border border-dark-border hover:border-brand-neon flex items-center justify-center text-gray-400 hover:text-brand-neon transition-colors">
+                            <i class="fa-brands fa-instagram"></i>
+                        </a>
+                        <a href="#" class="w-9 h-9 rounded-xl bg-dark-card border border-dark-border hover:border-brand-neon flex items-center justify-center text-gray-400 hover:text-brand-neon transition-colors">
+                            <i class="fa-brands fa-youtube"></i>
+                        </a>
+                        <a href="#" class="w-9 h-9 rounded-xl bg-dark-card border border-dark-border hover:border-brand-neon flex items-center justify-center text-gray-400 hover:text-brand-neon transition-colors">
+                            <i class="fa-brands fa-twitch"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Col 2: Quick Links -->
+                <div>
+                    <h4 class="text-sm font-bold font-orbitron text-white uppercase tracking-wider mb-4">Catálogo</h4>
+                    <ul class="space-y-2.5 text-sm text-gray-400">
+                        <li><a href="#/catalogo" onclick="goToCategory('consolas'); return false;" class="hover:text-brand-neon transition-colors">Consolas PS5 & Xbox</a></li>
+                        <li><a href="#/catalogo" onclick="goToCategory('consolas'); return false;" class="hover:text-brand-neon transition-colors">Nintendo Switch OLED</a></li>
+                        <li><a href="#/catalogo" onclick="goToCategory('mandos'); return false;" class="hover:text-brand-neon transition-colors">Mandos DualSense Edge</a></li>
+                        <li><a href="#/catalogo" onclick="goToCategory('mandos'); return false;" class="hover:text-brand-neon transition-colors">Xbox Elite Series 2</a></li>
+                        <li><a href="#/catalogo" onclick="goToCategory('accesorios'); return false;" class="hover:text-brand-neon transition-colors">Dock & Cargadores</a></li>
+                        <li><a href="#/juegos" class="hover:text-brand-neon transition-colors">Juegos</a></li>
+                    </ul>
+                </div>
+
+                <!-- Col 3: Customer Care -->
+                <div>
+                    <h4 class="text-sm font-bold font-orbitron text-white uppercase tracking-wider mb-4">Soporte</h4>
+                    <ul class="space-y-2.5 text-sm text-gray-400">
+                        <li><a href="#/pedido" class="hover:text-brand-neon transition-colors">Estado de mi Pedido</a></li>
+                        <li><a href="#/garantia" class="hover:text-brand-neon transition-colors">Políticas de Garantía</a></li>
+                        <li><a href="#/garantia" class="hover:text-brand-neon transition-colors">Términos de Envío</a></li>
+                        <li><a href="#/faq" class="hover:text-brand-neon transition-colors">Centro de Ayuda / FAQ</a></li>
+                        <li><a href="#/contacto" class="hover:text-brand-neon transition-colors">Servicio Técnico</a></li>
+                    </ul>
+                </div>
+
+                <!-- Col 4: Payments -->
+                <div>
+                    <h4 class="text-sm font-bold font-orbitron text-white uppercase tracking-wider mb-4">Pagos Seguros</h4>
+                    <p class="text-xs text-gray-400 mb-3">Tarjetas, Yape, Plin, PayPal, PagoEfectivo y transferencia. Precios en Soles (S/).</p>
+                    <div class="flex flex-wrap gap-2 text-2xl text-gray-400">
+                        <i class="fa-brands fa-cc-visa hover:text-white transition-colors"></i>
+                        <i class="fa-brands fa-cc-mastercard hover:text-white transition-colors"></i>
+                        <i class="fa-brands fa-cc-paypal hover:text-white transition-colors"></i>
+                    </div>
+                    <div class="flex flex-wrap gap-2 mt-3 text-[11px] font-semibold">
+                        <span class="px-2 py-1 rounded-md bg-purple-500/15 text-purple-300 border border-purple-500/30">Yape</span>
+                        <span class="px-2 py-1 rounded-md bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">Plin</span>
+                        <span class="px-2 py-1 rounded-md bg-amber-500/15 text-amber-300 border border-amber-500/30">PagoEfectivo</span>
+                        <span class="px-2 py-1 rounded-md bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">Transferencia</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Bottom Copyright -->
+            <div class="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-gray-500 gap-4">
+                <p>&copy; 2026 GameVault Inc. Todos los derechos reservados.</p>
+                <div class="flex space-x-6">
+                    <a href="#" class="hover:text-gray-400">Privacidad</a>
+                    <a href="#" class="hover:text-gray-400">Términos de Servicio</a>
+                    <a href="#" class="hover:text-gray-400">Cookies</a>
+                    <button type="button" onclick="resetStock()" class="hover:text-gray-400">Restablecer stock (demo)</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Logic Script -->
+    <script>
+        // Ilustración generada para productos sin foto (reemplázala por una foto real cuando la tengas)
+        function ilus(emoji, c1, c2, texto) {
+            var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="' + c1 + '"/><stop offset="1" stop-color="' + c2 + '"/></linearGradient></defs><rect width="400" height="300" rx="18" fill="#0a0d14"/><rect width="400" height="300" rx="18" fill="url(#g)" opacity=".28"/><circle cx="200" cy="128" r="84" fill="url(#g)" opacity=".35"/><text x="200" y="160" text-anchor="middle" font-size="96" font-family="Segoe UI Emoji,Apple Color Emoji,Noto Color Emoji,sans-serif">' + emoji + '</text><text x="200" y="262" text-anchor="middle" font-size="19" font-weight="700" letter-spacing="2" font-family="Arial,sans-serif" fill="#e5e7eb">' + texto + '</text></svg>';
+            return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+        }
+
+        // Database of Products (Consoles & Controllers)
+        const products = [
+            {
+                id: 1,
+                name: "PlayStation 5 Slim 1TB",
+                category: "consolas",
+                price: 1874.90,
+                originalPrice: 2061.90,
+                rating: 5,
+                tag: "Oferta",
+                tagColor: "bg-brand-pink",
+                image: "https://images.unsplash.com/photo-1606813907291-d86efa9b94db?auto=format&fit=crop&w=600&q=80",
+                description: "Consola PS5 de diseño estilizado con lector de discos y 1TB SSD ultra rápido."
+            },
+            {
+                id: 2,
+                name: "Mando DualSense Edge PS5",
+                category: "mandos",
+                price: 749.90,
+                originalPrice: 824.90,
+                rating: 5,
+                tag: "Pro Level",
+                tagColor: "bg-brand-neon text-black",
+                image: "https://images.unsplash.com/photo-1592840496694-26d035b52b48?auto=format&fit=crop&w=600&q=80",
+                description: "Mando inalámbrico de alto rendimiento con botones asignables y gatillos ajustables."
+            },
+            {
+                id: 3,
+                name: "Xbox Series X 1TB Robot White",
+                category: "consolas",
+                price: 1799.90,
+                originalPrice: 1874.90,
+                rating: 5,
+                tag: "Stock Alto",
+                tagColor: "bg-emerald-500",
+                image: "https://images.unsplash.com/photo-1621259182978-fbf93132d53d?auto=format&fit=crop&w=600&q=80",
+                description: "La consola Xbox más potente jamás creada con soporte 4K real y 12 Teraflops de rendimiento."
+            },
+            {
+                id: 4,
+                name: "Xbox Elite Series 2 Core",
+                category: "mandos",
+                price: 486.90,
+                originalPrice: 561.90,
+                rating: 4,
+                tag: "Más Vendido",
+                tagColor: "bg-purple-600",
+                image: "https://images.unsplash.com/photo-1600080972464-8e5f35f63d08?auto=format&fit=crop&w=600&q=80",
+                description: "Mando con palancas de tensión ajustable, agarre engomado y hasta 40 horas de batería."
+            },
+            {
+                id: 5,
+                name: "Nintendo Switch OLED White",
+                category: "consolas",
+                price: 1311.90,
+                originalPrice: 1424.90,
+                rating: 5,
+                tag: "Popular",
+                tagColor: "bg-red-500",
+                image: "https://images.unsplash.com/photo-1578303512597-81e6cc155b3e?auto=format&fit=crop&w=600&q=80",
+                description: "Pantalla OLED vibrante de 7 pulgadas, soporte ancho ajustable y puerto LAN integrado."
+            },
+            {
+                id: 6,
+                name: "Mando Pro Controller Switch",
+                category: "mandos",
+                price: 261.90,
+                originalPrice: 299.90,
+                rating: 5,
+                tag: "Original",
+                tagColor: "bg-blue-600",
+                image: "https://images.unsplash.com/photo-1580327344181-c1163234e5a0?auto=format&fit=crop&w=600&q=80",
+                description: "Mando ergonómico oficial para Nintendo Switch con sensores de movimiento y HD rumble."
+            },
+            {
+                id: 7,
+                name: "Base de Carga DualSense PS5",
+                category: "accesorios",
+                price: 111.90,
+                originalPrice: 130.90,
+                rating: 4,
+                tag: "Accesorio",
+                tagColor: "bg-gray-600",
+                image: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=600&q=80",
+                description: "Carga hasta dos mandos inalámbricos DualSense al mismo tiempo sin conectarlos a la consola."
+            },
+            {
+                id: 8,
+                name: "Auriculares Wireless Pulse 3D",
+                category: "accesorios",
+                price: 336.90,
+                originalPrice: 374.90,
+                rating: 5,
+                tag: "Audio 3D",
+                tagColor: "bg-brand-neon text-black",
+                image: "https://images.unsplash.com/photo-1546435770-a3e426bf472b?auto=format&fit=crop&w=600&q=80",
+                description: "Afinados para ofrecer el audio 3D de la consola PS5 con cancelación de ruido dual."
+            },
+            {
+                id: 9, name: "Cable HDMI 2.1 Ultra High Speed 2 m", category: "accesorios", price: 59.90, originalPrice: 74.90, rating: 5,
+                tag: "4K 120 Hz", tagColor: "bg-gray-600", image: ilus("🔌", "#6366f1", "#00f0ff", "HDMI 2.1 · 8K"),
+                description: "Cable certificado para 4K a 120 Hz y 8K a 60 Hz, con VRR. Compatible con PS5, Xbox Series X|S y PC."
+            },
+            {
+                id: 10, name: "SSD NVMe M.2 1TB con disipador (PS5)", category: "accesorios", price: 489.90, originalPrice: 569.90, rating: 5,
+                tag: "Expande tu PS5", tagColor: "bg-brand-neon text-black", image: ilus("💽", "#00f0ff", "#6366f1", "SSD NVMe 1TB"),
+                description: "Duplica el almacenamiento de tu PS5 con lectura de hasta 7,000 MB/s. Incluye disipador de calor para instalación en la ranura M.2."
+            },
+            {
+                id: 11, name: "Tarjeta microSD 256GB para Switch", category: "accesorios", price: 119.90, originalPrice: 149.90, rating: 5,
+                tag: "Switch", tagColor: "bg-red-500", image: ilus("💾", "#e60012", "#4a0610", "microSD 256GB"),
+                description: "Amplía la memoria de tu Nintendo Switch o Switch OLED para guardar más juegos digitales, capturas y partidas."
+            },
+            {
+                id: 12, name: "Estuche rígido para Switch OLED", category: "accesorios", price: 69.90, originalPrice: 84.90, rating: 4,
+                tag: "Protección", tagColor: "bg-blue-600", image: ilus("🧳", "#3b82f6", "#1e3a8a", "Estuche rígido"),
+                description: "Estuche resistente a golpes con espacio para 10 juegos y compartimento para cargador y Joy-Con."
+            },
+            {
+                id: 13, name: "Estación de carga para 4 Joy-Con", category: "accesorios", price: 89.90, originalPrice: 109.90, rating: 4,
+                tag: "Switch", tagColor: "bg-red-500", image: ilus("🔋", "#ff007f", "#8a2be2", "Carga 4 Joy-Con"),
+                description: "Carga hasta cuatro Joy-Con a la vez con indicadores LED y protección contra sobrecarga."
+            },
+            {
+                id: 14, name: "Audífonos Xbox Wireless Headset", category: "accesorios", price: 399.90, originalPrice: 449.90, rating: 5,
+                tag: "Xbox / PC", tagColor: "bg-emerald-500", image: ilus("🎧", "#107c10", "#06240a", "Xbox Headset"),
+                description: "Audio espacial con micrófono con cancelación de ruido, conexión inalámbrica directa a Xbox, PC y móvil."
+            },
+            {
+                id: 15, name: "Cámara HD para PS5", category: "accesorios", price: 249.90, originalPrice: 289.90, rating: 4,
+                tag: "Streaming", tagColor: "bg-brand-purple", image: ilus("📷", "#8a2be2", "#00f0ff", "Cámara HD PS5"),
+                description: "Transmite tus partidas en 1080p con dos lentes y elimina el fondo para mostrarte solo a ti."
+            },
+            {
+                id: 16, name: "Soporte vertical con ventilador para PS5", category: "accesorios", price: 99.90, originalPrice: 124.90, rating: 4,
+                tag: "Refrigeración", tagColor: "bg-gray-600", image: ilus("🌬️", "#00f0ff", "#0a1a4a", "Soporte + cooler"),
+                description: "Mantiene tu PS5 en posición vertical y reduce la temperatura con ventilador. Incluye carga para dos mandos."
+            },
+            {
+                id: 17, name: "Batería recargable + cable USB-C (Xbox)", category: "accesorios", price: 74.90, originalPrice: 89.90, rating: 4,
+                tag: "Play & Charge", tagColor: "bg-emerald-500", image: ilus("🔋", "#107c10", "#00f0ff", "Batería Xbox"),
+                description: "Juega mientras cargas con el cable de 3 m incluido. Compatible con mandos Xbox Series X|S y Xbox One."
+            },
+            {
+                id: 18, name: "Set de grips para mandos (8 piezas)", category: "accesorios", price: 39.90, originalPrice: 49.90, rating: 4,
+                tag: "Precisión", tagColor: "bg-brand-pink", image: ilus("🕹️", "#ff007f", "#ffb300", "Thumb grips x8"),
+                description: "Protectores de goma para los sticks, en distintas alturas y formas. Para mandos PS5, PS4 y Xbox."
+            },
+            {
+                id: 19, name: "Control remoto multimedia PS5", category: "accesorios", price: 119.90, originalPrice: 139.90, rating: 4,
+                tag: "Multimedia", tagColor: "bg-blue-600", image: ilus("📺", "#0070d1", "#0a1a4a", "Remoto multimedia"),
+                description: "Controla películas, series y música en tu PS5 sin usar el mando. Se conecta por Bluetooth."
+            },
+            {
+                id: 20, name: "Capturadora de video 4K USB", category: "accesorios", price: 329.90, originalPrice: 389.90, rating: 4,
+                tag: "Creadores", tagColor: "bg-brand-purple", image: ilus("🎥", "#8a2be2", "#ff007f", "Capturadora 4K"),
+                description: "Graba y transmite tus partidas de consola en 4K con paso de señal sin latencia. Compatible con OBS."
+            }
+        ];
+
+        // State Management
+        let cart = [];
+        let currentFilter = 'all';
+
+        // ===== Moneda, stock y pedidos =====
+        const money = n => 'S/ ' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        const MAX_PEDIDO = 5; // máximo de unidades por producto en un pedido
+        const STOCK_INICIAL = { 1: 8, 2: 3, 3: 12, 4: 5, 5: 2, 6: 15, 7: 20, 8: 0, 101: 10, 102: 4, 103: 6, 104: 9, 105: 2, 106: 7, 107: 5, 108: 8, 109: 4, 110: 6, 111: 9, 112: 3, 9: 25, 10: 6, 11: 14, 12: 18, 13: 7, 14: 5, 15: 4, 16: 10, 17: 12, 18: 30, 19: 6, 20: 3 };
+        function leerLS(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } }
+        function escribirLS(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+        let stock = Object.assign({}, STOCK_INICIAL, leerLS('gv-stock') || {});
+        function saveStock() { escribirLS('gv-stock', stock); }
+        function stockOf(id) { return stock[id] || 0; }
+        function limitOf(id) { return Math.min(stockOf(id), MAX_PEDIDO); }
+        function stockBadge(id) {
+            const s = stockOf(id);
+            if (s <= 0) return '<p class="mt-2 mb-1 text-[11px] font-semibold text-red-400"><i class="fa-solid fa-ban mr-1"></i>Agotado</p>';
+            if (s <= 3) return '<p class="mt-2 mb-1 text-[11px] font-semibold text-amber-400"><i class="fa-solid fa-fire mr-1"></i>¡Solo quedan ' + s + '!</p>';
+            return '<p class="mt-2 mb-1 text-[11px] font-semibold text-emerald-400"><i class="fa-solid fa-circle-check mr-1"></i>' + s + ' en stock</p>';
+        }
+        function guardarPedido(o) { const l = leerLS('gv-pedidos') || []; l.unshift(o); escribirLS('gv-pedidos', l.slice(0, 10)); }
+        function resetStock() {
+            stock = Object.assign({}, STOCK_INICIAL); saveStock();
+            try { localStorage.removeItem('gv-pedidos'); } catch (e) {}
+            refreshAll(); showToast('Stock restablecido (demo).');
+        }
+
+        // DOM Elements
+        const productsGrid = document.getElementById('products-grid');
+        const cartDrawer = document.getElementById('cart-drawer');
+        const cartPanel = document.getElementById('cart-panel');
+        const cartCountEl = document.getElementById('cart-count');
+        const cartItemsContainer = document.getElementById('cart-items-container');
+        const cartSubtotalEl = document.getElementById('cart-subtotal');
+        const cartTotalEl = document.getElementById('cart-total');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const checkoutModal = document.getElementById('checkout-modal');
+        const toast = document.getElementById('toast');
+        const toastMessage = document.getElementById('toast-message');
+
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', () => {
+            renderProducts(products);
+            setupEventListeners();
+            renderGuide();
+            startOnlineCounter();
+        });
+
+        // Render Products
+        function renderProducts(items) {
+            productsGrid.innerHTML = '';
+            if (!items.length) { productsGrid.innerHTML = '<p class="col-span-full text-center text-gray-400 py-12">No encontramos productos con esos filtros.</p>'; return; }
+
+            items.forEach(product => {
+                const stars = Array(product.rating).fill('<i class="fa-solid fa-star text-amber-400"></i>').join('');
+                
+                const cardHtml = `
+                    <div class="glass-panel rounded-2xl p-5 border border-dark-border hover:border-brand-neon/60 transition-all duration-300 flex flex-col justify-between group hover:-translate-y-1">
+                        <div>
+                            <!-- Card Header (Tag & Wishlist) -->
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider ${product.tagColor}">
+                                    ${product.tag}
+                                </span>
+                                <button class="text-gray-500 hover:text-brand-pink transition-colors">
+                                    <i class="fa-regular fa-heart text-base"></i>
+                                </button>
+                            </div>
+
+                            <!-- Product Image -->
+                            <div onclick="verProducto(${product.id})" class="cursor-pointer h-48 w-full bg-dark-bg/60 rounded-xl flex items-center justify-center p-3 mb-4 overflow-hidden relative">
+                                <img src="${product.image}" alt="${product.name}" class="h-full w-full object-contain group-hover:scale-105 transition-transform duration-300" onerror="this.src='https://placehold.co/400x300/121824/00f0ff?text=Console'">
+                            </div>
+
+                            <!-- Title & Description -->
+                            <div class="flex items-center gap-1 text-xs mb-1">
+                                ${stars}
+                            </div>
+                            <h3 onclick="verProducto(${product.id})" class="cursor-pointer font-bold text-white text-base mb-1 group-hover:text-brand-neon transition-colors line-clamp-1">${product.name}</h3>
+                            <p class="text-xs text-gray-400 mb-2 line-clamp-2">${product.description}</p>${stockBadge(product.id)}
+                        </div>
+
+                        <!-- Price & Action Button -->
+                        <div class="pt-3 border-t border-dark-border/50 flex items-center justify-between">
+                            <div>
+                                <span class="text-lg font-bold font-orbitron text-brand-neon">${money(product.price)}</span>
+                                ${product.originalPrice ? `<span class="text-xs text-gray-500 line-through block">${money(product.originalPrice)}</span>` : ''}
+                            </div>
+                            <button onclick="addToCart(${product.id})" ${stockOf(product.id) <= 0 ? 'disabled' : ''} class="disabled:opacity-40 disabled:cursor-not-allowed px-3.5 py-2 rounded-xl bg-dark-hover hover:bg-brand-500 border border-dark-border hover:border-brand-500 text-white text-xs font-semibold transition-all duration-200 flex items-center gap-1.5">
+                                <i class="fa-solid fa-cart-plus"></i> Agregar
+                            </button>
+                        </div>
+                    </div>
+                `;
+                productsGrid.insertAdjacentHTML('beforeend', cardHtml);
+            });
+        }
+
+        // Filter Function
+        function filterProducts(category) {
+            currentFilter = category;
+            
+            // Update active state on buttons
+            document.querySelectorAll('#filter-buttons button').forEach(btn => {
+                btn.classList.remove('bg-brand-500', 'border-brand-500', 'text-white', 'shadow-lg');
+                btn.classList.add('bg-dark-card', 'border-dark-border', 'text-gray-300');
+            });
+
+            const activo = document.querySelector(`#filter-buttons button[onclick="filterProducts('${category}')"]`);
+            if (activo) {
+                activo.classList.remove('bg-dark-card', 'border-dark-border', 'text-gray-300');
+                activo.classList.add('bg-brand-500', 'border-brand-500', 'text-white', 'shadow-lg');
+            }
+            refreshCatalog();
+        }
+
+        // Aplica categoría + búsqueda + stock + orden
+        function refreshCatalog() {
+            let items = currentFilter === 'all' ? products.slice() : products.filter(p => p.category === currentFilter);
+            const q = ((document.getElementById('buscar') || {}).value || '').trim().toLowerCase();
+            if (q) items = items.filter(p => (p.name + ' ' + p.description).toLowerCase().includes(q));
+            const soloStock = document.getElementById('solo-stock');
+            if (soloStock && soloStock.checked) items = items.filter(p => stockOf(p.id) > 0);
+            const o = (document.getElementById('orden') || {}).value;
+            if (o === 'asc') items.sort((a, b) => a.price - b.price);
+            if (o === 'desc') items.sort((a, b) => b.price - a.price);
+            if (o === 'dto') items.sort((a, b) => (1 - b.price / b.originalPrice) - (1 - a.price / a.originalPrice));
+            renderProducts(items);
+            const c = document.getElementById('result-count');
+            if (c) c.textContent = items.length + ' producto' + (items.length === 1 ? '' : 's');
+        }
+
+        // Cart Actions
+        function addToCart(productId, qty) {
+            qty = qty || 1;
+            const product = (typeof games !== 'undefined' ? products.concat(games) : products).find(p => p.id === productId);
+            if (stockOf(productId) <= 0) { showToast('Lo sentimos, ' + product.name + ' está agotado.'); return; }
+            const idx = cart.findIndex(item => item.id === productId);
+            const actual = idx > -1 ? cart[idx].quantity : 0;
+            const permitido = limitOf(productId) - actual;
+            if (permitido <= 0) { showToast('Límite alcanzado: máx. ' + limitOf(productId) + ' unidad(es) de este producto por pedido.'); return; }
+            const sumar = Math.min(qty, permitido);
+            if (idx > -1) { cart[idx].quantity += sumar; } else { cart.push({ ...product, quantity: sumar }); }
+            updateCartUI();
+            showToast(sumar < qty ? 'Solo pudimos añadir ' + sumar + ' (límite de stock/pedido).' : `¡${product.name} añadido al carrito!`);
+        }
+
+        function removeFromCart(productId) {
+            cart = cart.filter(item => item.id !== productId);
+            updateCartUI();
+        }
+
+        function updateQuantity(productId, delta) {
+            const item = cart.find(item => item.id === productId);
+            if (item) {
+                if (delta > 0 && item.quantity >= limitOf(item.id)) { showToast('Máximo ' + limitOf(item.id) + ' unidades (stock disponible: ' + stockOf(item.id) + ').'); return; }
+                item.quantity += delta;
+                if (item.quantity <= 0) {
+                    removeFromCart(productId);
+                } else {
+                    updateCartUI();
+                }
+            }
+        }
+
+        function updateCartUI() {
+            // Count total items
+            const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+            cartCountEl.innerText = totalCount;
+
+            // Render items in drawer
+            cartItemsContainer.innerHTML = '';
+
+            if (cart.length === 0) {
+                cartItemsContainer.innerHTML = `
+                    <div class="h-full flex flex-col items-center justify-center text-center text-gray-500 space-y-3 py-12">
+                        <i class="fa-solid fa-cart-flatbed text-4xl"></i>
+                        <p class="text-sm font-medium">Tu carrito está vacío</p>
+                        <a href="#/catalogo" onclick="toggleCart()" class="text-xs text-brand-neon hover:underline">Explorar productos</a>
+                    </div>
+                `;
+                document.getElementById('checkout-btn').disabled = true;
+            } else {
+                document.getElementById('checkout-btn').disabled = false;
+
+                cart.forEach(item => {
+                    const itemHtml = `
+                        <div class="flex items-center gap-3 p-3 rounded-xl bg-dark-card border border-dark-border">
+                            <img src="${item.image}" alt="${item.name}" class="w-16 h-16 object-contain rounded-lg bg-dark-bg p-1">
+                            <div class="flex-1 min-w-0">
+                                <h4 class="text-xs font-bold text-white truncate">${item.name}</h4>
+                                <p class="text-xs text-brand-neon font-orbitron font-semibold">${money((item.price * item.quantity))}</p>
+                                <div class="flex items-center gap-2 mt-2">
+                                    <button onclick="updateQuantity(${item.id}, -1)" class="w-5 h-5 rounded bg-dark-bg hover:bg-dark-hover flex items-center justify-center text-xs text-gray-300">-</button>
+                                    <span class="text-xs font-bold text-white px-1">${item.quantity}</span>
+                                    <button onclick="updateQuantity(${item.id}, 1)" ${item.quantity >= limitOf(item.id) ? 'disabled' : ''} class="disabled:opacity-30 disabled:cursor-not-allowed w-5 h-5 rounded bg-dark-bg hover:bg-dark-hover flex items-center justify-center text-xs text-gray-300">+</button><span class="text-[10px] text-gray-500 ml-1">máx. ${limitOf(item.id)}</span>
+                                </div>
+                            </div>
+                            <button onclick="removeFromCart(${item.id})" class="text-gray-500 hover:text-red-400 p-1">
+                                <i class="fa-solid fa-trash-can text-sm"></i>
+                            </button>
+                        </div>
+                    `;
+                    cartItemsContainer.insertAdjacentHTML('beforeend', itemHtml);
+                });
+            }
+
+            // Calculate Subtotal & Total
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            cartSubtotalEl.innerText = `${money(subtotal)}`;
+            cartTotalEl.innerText = `${money(subtotal)}`;
+            document.getElementById('checkout-total-price').innerText = `${money(subtotal)}`;
+        }
+
+        // Toggle Cart Drawer Visibility
+        function toggleCart() {
+            const isHidden = cartDrawer.classList.contains('pointer-events-none');
+
+            if (isHidden) {
+                cartDrawer.classList.remove('pointer-events-none', 'opacity-0');
+                cartDrawer.classList.add('opacity-100');
+                cartPanel.classList.remove('translate-x-full');
+            } else {
+                cartPanel.classList.add('translate-x-full');
+                cartDrawer.classList.remove('opacity-100');
+                cartDrawer.classList.add('opacity-0', 'pointer-events-none');
+            }
+        }
+
+        // Custom Order Form Handler
+        function handleFormSubmit(event) {
+            event.preventDefault();
+            const name = document.getElementById('name').value;
+            showToast(`¡Gracias ${name}! Recibimos tu solicitud.`);
+            document.getElementById('custom-order-form').reset();
+        }
+
+        // Show Toast Notification
+        function showToast(message) {
+            toastMessage.innerText = message;
+            toast.classList.remove('translate-y-24', 'opacity-0', 'pointer-events-none');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 3000);
+        }
+
+        // Construye la guía y las estadísticas desde el array products
+    function renderGuide() {
+        ['consolas', 'mandos', 'accesorios'].forEach(cat => {
+            const list = document.getElementById('guide-' + cat);
+            list.innerHTML = products
+                .filter(p => p.category === cat)
+                .map(p => `
+                    <li>
+                        <button onclick="goToCategory('${cat}')" class="w-full text-left text-sm text-gray-200 bg-dark-card border border-dark-border border-l-4 border-l-brand-500 hover:border-l-brand-neon hover:text-brand-neon rounded-lg px-3 py-2.5 transition-colors">
+                            ${p.name}
+                        </button>
+                    </li>`)
+                .join('');
+        });
+
+        document.getElementById('stat-consolas').innerText = products.filter(p => p.category === 'consolas').length;
+        document.getElementById('stat-mandos').innerText = products.filter(p => p.category === 'mandos').length;
+        document.getElementById('stat-total').innerText = products.length;
+    }
+
+    // Al hacer clic en un producto de la guía: filtra el catálogo y baja a él
+    function goToCategory(cat) {
+        const btn = document.querySelector(`#filter-buttons button[onclick="filterProducts('${cat}')"]`);
+        if (btn) btn.click();
+        if (location.hash !== '#/catalogo') { location.hash = '#/catalogo'; } else { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    }
+
+    // Contador de usuarios conectados (simulado)
+    function startOnlineCounter() {
+        const el = document.getElementById('online-users');
+        let users = 122;
+        setInterval(() => {
+            users += Math.floor(Math.random() * 7) - 3; // -3 a +3
+            users = Math.max(90, Math.min(160, users));
+            el.innerText = users;
+        }, 4000);
+    }
+
+        // Setup remaining Event Listeners
+        function setupEventListeners() {
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+        }
+    </script>
+    <!-- Lógica de la lámpara GameVault -->
+    <script>
+    (function () {
+        var temas = {
+            neon:    { a: '#00f0ff', b: '#ff007f', rgb: '0, 240, 255', nombre: 'Neón' },
+            violeta: { a: '#8a2be2', b: '#00f0ff', rgb: '138, 43, 226', nombre: 'Violeta' },
+            rosa:    { a: '#ff007f', b: '#ffb300', rgb: '255, 0, 127', nombre: 'Rosa' }
+        };
+        var body = document.body;
+        var btn = document.getElementById('lamp-btn');
+        var estado = document.getElementById('lamp-state');
+        var chips = document.querySelectorAll('#vault-lamp .chip');
+        var temaActual = 'neon';
+
+        function guardar(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+        function leer(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+        function aviso(msg) { if (typeof showToast === 'function') showToast(msg); }
+
+        function aplicarTema(clave) {
+            var t = temas[clave] || temas.neon;
+            temaActual = temas[clave] ? clave : 'neon';
+            var r = document.documentElement.style;
+            r.setProperty('--lamp-a', t.a);
+            r.setProperty('--lamp-b', t.b);
+            r.setProperty('--lamp-rgb', t.rgb);
+            chips.forEach(function (c) { c.setAttribute('aria-pressed', String(c.dataset.theme === temaActual)); });
+            guardar('gv-lampara-tema', temaActual);
+        }
+
+        function ponerLampara(encendida, conAviso) {
+            body.classList.toggle('vault-on', encendida);
+            btn.setAttribute('aria-pressed', String(encendida));
+            btn.setAttribute('aria-label', (encendida ? 'Apagar' : 'Encender') + ' lámpara (tecla L)');
+            estado.textContent = encendida ? 'ENCENDIDA' : 'APAGADA';
+            guardar('gv-lampara', encendida ? '1' : '0');
+            if (encendida) {
+                body.classList.add('vault-flicker');
+                setTimeout(function () { body.classList.remove('vault-flicker'); }, 650);
+            }
+            if (conAviso) {
+                aviso(encendida
+                    ? 'Modo ' + temas[temaActual].nombre + ' activado: ambiente gamer encendido.'
+                    : 'Lámpara apagada. Luces fuera.');
+            }
+        }
+
+        btn.addEventListener('click', function () { ponerLampara(!body.classList.contains('vault-on'), true); });
+
+        chips.forEach(function (c) {
+            c.addEventListener('click', function () {
+                aplicarTema(c.dataset.theme);
+                if (!body.classList.contains('vault-on')) ponerLampara(true, false);
+                aviso('Color de la lámpara: ' + temas[temaActual].nombre + '.');
+            });
+        });
+
+        // Tecla L para encender / apagar (sin interferir al escribir en formularios)
+        document.addEventListener('keydown', function (e) {
+            var tag = (e.target.tagName || '').toLowerCase();
+            if (e.key.toLowerCase() !== 'l' || e.ctrlKey || e.metaKey || e.altKey) return;
+            if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+            ponerLampara(!body.classList.contains('vault-on'), true);
+        });
+
+        // Recordar la última configuración del visitante
+        aplicarTema(leer('gv-lampara-tema') || 'neon');
+        ponerLampara(leer('gv-lampara') === '1', false);
+    })();
+    </script>
+    <!-- Lógica: juegos, barra superior y volver al inicio -->
+    <script>
+    // --- Juegos: portadas reales (Steam / wikis) con respaldo automático a portada generada ---
+    function portada(lineas, c1, c2, plataforma) {
+        var t = lineas.map(function (l, i) {
+            return '<text x="150" y="' + (170 + i * 34) + '" text-anchor="middle" font-family="Arial Black,Arial,sans-serif" font-size="24" fill="#fff">' + l + '</text>';
+        }).join('');
+        var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 380"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="' + c1 + '"/><stop offset="1" stop-color="' + c2 + '"/></linearGradient></defs><rect width="300" height="380" fill="url(#g)"/><rect x="12" y="12" width="276" height="356" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="2"/>' + t + '<text x="150" y="352" text-anchor="middle" font-family="Arial,sans-serif" font-size="14" letter-spacing="3" fill="rgba(255,255,255,.85)">' + plataforma + '</text></svg>';
+        return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+    }
+    var COL = { PS5: ['#0070d1', '#0a1a4a'], Xbox: ['#107c10', '#06240a'], Switch: ['#e60012', '#4a0610'] };
+    function steam(id) {
+        return ['https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/' + id + '/library_600x900.jpg',
+                'https://cdn.cloudflare.steamstatic.com/steam/apps/' + id + '/library_600x900.jpg',
+                'https://cdn.cloudflare.steamstatic.com/steam/apps/' + id + '/header.jpg'];
+    }
+    var COVER_SRCS = {};   // url principal -> lista completa de alternativas (para el respaldo)
+    function juego(id, nombre, lineas, plat, genero, precio, original, rating, anio, pegi, desc, fuentes) {
+        var fallback = portada(lineas, COL[plat][0], COL[plat][1], plat.toUpperCase());
+        var lista = fuentes.concat([fallback]);
+        lista.forEach(function (u) { COVER_SRCS[u] = lista; });
+        return { id: id, name: nombre, platform: plat, genre: genero, price: precio, originalPrice: original, rating: rating,
+                 year: anio, pegi: pegi, category: 'juegos', image: lista[0],
+                 description: desc + ' Plataforma: ' + plat + ' · Lanzamiento: ' + anio + ' · PEGI ' + pegi + '. Juego original con entrega rápida.' };
+    }
+    var games = [
+        juego(101, 'God of War Ragnarök', ['GOD OF WAR', 'RAGNARÖK'], 'PS5', 'Acción / Aventura', 224.90, 261.90, 5, 2022, 18,
+              'Kratos y Atreus recorren los Nueve Reinos mientras se acerca el Ragnarök, con combates brutales y una historia muy emotiva.', steam(2322010)),
+        juego(102, "Marvel's Spider-Man 2", ['SPIDER-MAN', '2'], 'PS5', 'Acción / Mundo abierto', 261.90, null, 5, 2023, 16,
+              'Alterna entre Peter Parker y Miles Morales y recorre un Nueva York ampliado, con nuevos trajes y habilidades.', steam(2651280)),
+        juego(103, 'Halo Infinite', ['HALO', 'INFINITE'], 'Xbox', 'Shooter', 186.90, 224.90, 4, 2021, 16,
+              'El Jefe Maestro vuelve en una campaña de mundo abierto sobre el anillo Zeta Halo, con gancho de agarre y multijugador.', steam(1240440)),
+        juego(104, 'Forza Horizon 5', ['FORZA', 'HORIZON 5'], 'Xbox', 'Carreras', 149.90, 224.90, 5, 2021, 3,
+              'Carreras de mundo abierto por México con cientos de autos, clima dinámico y festivales todo el año.', steam(1551360)),
+        juego(105, 'Zelda: Tears of the Kingdom', ['ZELDA', 'TEARS OF', 'THE KINGDOM'], 'Switch', 'Aventura', 261.90, null, 5, 2023, 12,
+              'Explora Hyrule y sus islas del cielo, y crea vehículos e inventos con las nuevas habilidades de Link.',
+              ['https://zeldawiki.wiki/wiki/Special:FilePath/TotK_NA_Box_Art.png']),
+        juego(106, 'Mario Kart 8 Deluxe', ['MARIO KART', '8 DELUXE'], 'Switch', 'Carreras / Familiar', 224.90, null, 5, 2017, 3,
+              'La versión definitiva de Mario Kart 8: 48 pistas, batallas renovadas y diversión para toda la familia.',
+              ['https://www.mariowiki.com/Special:FilePath/MK8_Deluxe_-_Box_NA.png']),
+        juego(107, 'Horizon Forbidden West', ['HORIZON', 'FORBIDDEN', 'WEST'], 'PS5', 'Acción / RPG', 169.90, 224.90, 5, 2022, 16,
+              'Aloy viaja al Oeste Prohibido para enfrentar una nueva amenaza, con máquinas gigantes y paisajes espectaculares.', steam(2420110)),
+        juego(108, 'Elden Ring', ['ELDEN', 'RING'], 'PS5', 'RPG / Acción', 199.90, 224.90, 5, 2022, 16,
+              'Un enorme mundo abierto creado por FromSoftware y George R. R. Martin, con jefes desafiantes y libertad total.', steam(1245620)),
+        juego(109, 'Starfield', ['STARFIELD'], 'Xbox', 'RPG / Espacio', 199.90, 261.90, 4, 2023, 16,
+              'El primer universo nuevo de Bethesda en 25 años: explora más de mil planetas y crea tu propia tripulación.', steam(1716740)),
+        juego(110, 'Hogwarts Legacy', ['HOGWARTS', 'LEGACY'], 'Xbox', 'RPG / Aventura', 149.90, 199.90, 4, 2023, 16,
+              'Vive tu propia historia en Hogwarts en el siglo XIX: aprende hechizos, prepara pociones y explora el castillo.', steam(990080)),
+        juego(111, 'Cyberpunk 2077', ['CYBERPUNK', '2077'], 'PS5', 'RPG / Acción', 129.90, 186.90, 4, 2020, 18,
+              'Conviértete en V en Night City, una metrópolis obsesionada con el poder, con la expansión Phantom Liberty.', steam(1091500)),
+        juego(112, 'Red Dead Redemption 2', ['RED DEAD', 'REDEMPTION 2'], 'Xbox', 'Acción / Mundo abierto', 139.90, 186.90, 5, 2018, 18,
+              'La épica del Salvaje Oeste de Rockstar: sigue a Arthur Morgan y su banda en un mundo vivo y detallado.', steam(1174180))
+    ];
+
+    // Respaldo global: si una portada no carga, prueba la siguiente fuente y al final usa la portada generada
+    document.addEventListener('error', function (e) {
+        var img = e.target;
+        if (!img || img.tagName !== 'IMG') return;
+        var actual = img.getAttribute('src');
+        var lista = COVER_SRCS[actual];
+        if (!lista) return;
+        var i = lista.indexOf(actual);
+        if (i > -1 && i < lista.length - 1) img.src = lista[i + 1];
+    }, true);
+
+    var plataformaActual = 'all', textoJuegos = '', ordenJuegos = 'rel', soloFavs = false;
+    function leerFavs() { try { return JSON.parse(localStorage.getItem('gv-favs') || '[]'); } catch (e) { return []; } }
+    function guardarFavs(l) { try { localStorage.setItem('gv-favs', JSON.stringify(l)); } catch (e) {} }
+    window.toggleFav = function (id) {
+        var f = leerFavs(), i = f.indexOf(id);
+        if (i > -1) f.splice(i, 1); else f.push(id);
+        guardarFavs(f);
+        if (typeof showToast === 'function') showToast(i > -1 ? 'Quitado de tus favoritos.' : 'Agregado a tus favoritos ♥');
+        renderGames();
+    };
+
+    // Estilos extra (carga suave de portadas, etiquetas y barra de herramientas)
+    (function () {
+        var s = document.createElement('style');
+        s.textContent =
+            '.cover-box{position:relative;background:linear-gradient(110deg,#121824 30%,#1a2234 50%,#121824 70%);background-size:200% 100%;animation:coverShimmer 1.4s linear infinite}' +
+            '@keyframes coverShimmer{to{background-position:-200% 0}}' +
+            '.cover-box img{opacity:0;transition:opacity .4s,transform .3s}.cover-box img.ok{opacity:1}' +
+            '.cover-box:has(img.ok){animation:none;background:#0a0d14}' +
+            '.fav-btn{position:absolute;top:8px;right:8px;width:34px;height:34px;border-radius:50%;background:rgba(10,13,20,.75);border:1px solid rgba(255,255,255,.15);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;z-index:2}' +
+            '.fav-btn:hover{transform:scale(1.12);border-color:#ff007f}.fav-btn.on{color:#ff007f;border-color:#ff007f}' +
+            '.fav-btn:focus-visible{outline:3px solid #f7e600;outline-offset:2px}' +
+            '.badge-dto{position:absolute;top:8px;left:8px;z-index:2;background:#ff007f;color:#fff;font-size:10px;font-weight:800;padding:3px 8px;border-radius:999px}' +
+            '.badge-pegi{position:absolute;bottom:8px;left:8px;z-index:2;background:rgba(10,13,20,.85);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:10px;font-weight:800;padding:2px 7px;border-radius:6px}';
+        document.head.appendChild(s);
+    })();
+
+    // Barra de búsqueda / orden / favoritos para la sección de juegos
+    (function () {
+        var grid = document.getElementById('games-grid');
+        var bar = document.createElement('div');
+        bar.className = 'flex flex-wrap items-center justify-center gap-3 mb-8';
+        bar.innerHTML =
+            '<div class="relative w-full sm:w-72"><i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm"></i>' +
+            '<input id="buscar-juegos" type="search" placeholder="Buscar juego o género..." aria-label="Buscar juegos" class="w-full pl-11 pr-4 py-2.5 rounded-xl bg-dark-bg border border-dark-border text-white text-sm placeholder-gray-500 focus:outline-none focus:border-brand-neon"></div>' +
+            '<select id="orden-juegos" aria-label="Ordenar juegos" class="px-4 py-2.5 rounded-xl bg-dark-bg border border-dark-border text-white text-sm focus:outline-none focus:border-brand-neon">' +
+            '<option value="rel">Destacados</option><option value="menor">Precio: menor a mayor</option><option value="mayor">Precio: mayor a menor</option><option value="dto">Mayor descuento</option><option value="az">Nombre A-Z</option></select>' +
+            '<button id="solo-favs" type="button" aria-pressed="false" class="px-4 py-2.5 rounded-xl bg-dark-bg border border-dark-border text-gray-300 text-sm hover:border-brand-pink transition-colors"><i class="fa-solid fa-heart text-brand-pink mr-2"></i>Mis favoritos <span id="favs-count" class="text-xs text-gray-500"></span></button>' +
+            '<span id="juegos-count" class="text-xs text-gray-400 w-full text-center" aria-live="polite"></span>';
+        grid.parentNode.insertBefore(bar, grid);
+        document.getElementById('buscar-juegos').addEventListener('input', function (e) { textoJuegos = e.target.value.trim().toLowerCase(); renderGames(); });
+        document.getElementById('orden-juegos').addEventListener('change', function (e) { ordenJuegos = e.target.value; renderGames(); });
+        document.getElementById('solo-favs').addEventListener('click', function () {
+            soloFavs = !soloFavs; this.setAttribute('aria-pressed', String(soloFavs));
+            this.classList.toggle('border-brand-pink', soloFavs); renderGames();
+        });
+    })();
+
+    function descuento(g) { return g.originalPrice ? Math.round((1 - g.price / g.originalPrice) * 100) : 0; }
+
+    function renderGames() {
+        var grid = document.getElementById('games-grid');
+        var favs = leerFavs();
+        var lista = games.filter(function (g) {
+            if (plataformaActual !== 'all' && g.platform !== plataformaActual) return false;
+            if (soloFavs && favs.indexOf(g.id) === -1) return false;
+            if (textoJuegos && (g.name + ' ' + g.genre + ' ' + g.platform).toLowerCase().indexOf(textoJuegos) === -1) return false;
+            return true;
+        });
+        if (ordenJuegos === 'menor') lista.sort(function (a, b) { return a.price - b.price; });
+        if (ordenJuegos === 'mayor') lista.sort(function (a, b) { return b.price - a.price; });
+        if (ordenJuegos === 'dto') lista.sort(function (a, b) { return descuento(b) - descuento(a); });
+        if (ordenJuegos === 'az') lista.sort(function (a, b) { return a.name.localeCompare(b.name); });
+        var fc = document.getElementById('favs-count'); if (fc) fc.textContent = favs.length ? '(' + favs.length + ')' : '';
+        var jc = document.getElementById('juegos-count'); if (jc) jc.textContent = lista.length + ' juego' + (lista.length === 1 ? '' : 's') + ' encontrado' + (lista.length === 1 ? '' : 's');
+        if (!lista.length) {
+            grid.innerHTML = '<p class="col-span-full text-center text-gray-400 py-12"><i class="fa-regular fa-face-frown text-3xl block mb-3"></i>No encontramos juegos con esos filtros.</p>';
+            return;
+        }
+        grid.innerHTML = lista.map(function (g) {
+            var estrellas = new Array(g.rating + 1).join('<i class="fa-solid fa-star text-amber-400"></i>');
+            var d = descuento(g), esFav = favs.indexOf(g.id) > -1;
+            return '<div class="glass-panel rounded-2xl p-4 border border-dark-border hover:border-brand-neon/60 transition-all duration-300 flex flex-col justify-between group hover:-translate-y-1">' +
+                '<div>' +
+                '<div class="relative mb-3">' +
+                '<div onclick="verProducto(' + g.id + ')" class="cover-box cursor-pointer aspect-[3/3.8] rounded-xl overflow-hidden"><img src="' + g.image + '" alt="Portada de ' + g.name + '" loading="lazy" onload="this.classList.add(\'ok\')" class="w-full h-full object-cover group-hover:scale-105"></div>' +
+                (d ? '<span class="badge-dto">-' + d + '%</span>' : '') +
+                '<span class="badge-pegi">PEGI ' + g.pegi + '</span>' +
+                '<button type="button" class="fav-btn ' + (esFav ? 'on' : '') + '" aria-pressed="' + esFav + '" aria-label="' + (esFav ? 'Quitar de favoritos: ' : 'Agregar a favoritos: ') + g.name + '" onclick="toggleFav(' + g.id + ')"><i class="fa-' + (esFav ? 'solid' : 'regular') + ' fa-heart"></i></button>' +
+                '</div>' +
+                '<div class="flex items-center justify-between mb-1"><span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-brand-500/20 text-brand-neon uppercase tracking-wider">' + g.platform + '</span><span class="text-[10px]">' + estrellas + '</span></div>' +
+                '<h3 class="font-bold text-white text-sm leading-snug group-hover:text-brand-neon transition-colors">' + g.name + '</h3>' +
+                '<p class="text-xs text-gray-400 mt-1">' + g.genre + ' · ' + g.year + '</p>' + stockBadge(g.id) + '</div>' +
+                '<div class="pt-3 mt-3 border-t border-dark-border/50 flex items-center justify-between">' +
+                '<div><span class="text-base font-bold font-orbitron text-brand-neon">' + money(g.price) + '</span>' +
+                (g.originalPrice ? '<span class="text-xs text-gray-500 line-through block">' + money(g.originalPrice) + '</span>' : '') + '</div>' +
+                '<button type="button" onclick="addToCart(' + g.id + ')" ' + (stockOf(g.id) <= 0 ? 'disabled' : '') + ' class="disabled:opacity-40 disabled:cursor-not-allowed px-3 py-2 rounded-xl bg-dark-hover hover:bg-brand-500 border border-dark-border hover:border-brand-500 text-white text-xs font-semibold transition-all flex items-center gap-1.5"><i class="fa-solid fa-cart-plus"></i> Agregar</button>' +
+                '</div></div>';
+        }).join('');
+    }
+
+    document.querySelectorAll('#game-filters .game-filter').forEach(function (b) {
+        b.addEventListener('click', function () {
+            plataformaActual = b.dataset.platform;
+            document.querySelectorAll('#game-filters .game-filter').forEach(function (x) { x.classList.toggle('active', x === b); });
+            renderGames();
+        });
+    });
+    renderGames();
+
+    // --- Volver a la página principal (pie de página) ---
+    function volverInicio() {
+        var todos = document.querySelector('#filter-buttons button');
+        if (todos) todos.click(); location.hash = '#/inicio';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // --- Barra superior: sección activa + progreso de lectura ---
+    (function () {
+        var ids = ['hero', 'guia', 'catalogo', 'juegos', 'beneficios', 'contacto'];
+        var links = document.querySelectorAll('#main-nav a, #mobile-menu a');
+        var barra = document.getElementById('scroll-progress');
+
+        function seccionActual() { return window.paginaActual || 'inicio'; }
+        function actualizar() {
+            var sec = seccionActual();
+            var filtro = (typeof currentFilter !== 'undefined') ? currentFilter : 'all';
+            links.forEach(function (a) {
+                var activo = a.dataset.cat ? (sec === 'catalogo' && filtro === a.dataset.cat) : (a.dataset.sec === sec);
+                a.classList.toggle('active', activo);
+                if (activo) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current');
+            });
+            var h = document.documentElement;
+            var max = h.scrollHeight - h.clientHeight;
+            barra.style.width = (max > 0 ? (h.scrollTop / max) * 100 : 0) + '%';
+        }
+        window.addEventListener('scroll', actualizar, { passive: true });
+        window.addEventListener('resize', actualizar);
+        var fb = document.getElementById('filter-buttons');
+        if (fb) fb.addEventListener('click', function () { setTimeout(actualizar, 0); });
+        document.querySelectorAll('#mobile-menu a').forEach(function (a) {
+            a.addEventListener('click', function () { document.getElementById('mobile-menu').classList.add('hidden'); setTimeout(actualizar, 400); });
+        });
+        links.forEach(function (a) { a.addEventListener('click', function () { setTimeout(actualizar, 600); }); });
+        actualizar();
+    })();
+    </script>
+
+    <!-- Subpáginas: router, ofertas, detalle, FAQ y pedidos -->
+    <script>
+    (function () {
+        var MAP = { videos: 'videos', inicio: 'inicio', hero: 'inicio', guia: 'inicio', catalogo: 'catalogo', juegos: 'juegos', ofertas: 'ofertas',
+                    garantia: 'garantia', beneficios: 'garantia', contacto: 'contacto', faq: 'faq', pedido: 'pedido', producto: 'producto' };
+        var TITULOS = { inicio: 'Consolas, Mandos y Accesorios Gaming', catalogo: 'Catálogo', juegos: 'Juegos', videos: 'Guía en video', ofertas: 'Ofertas',
+                        garantia: 'Garantía y Envíos', contacto: 'Contacto', faq: 'Preguntas Frecuentes', pedido: 'Estado de mi Pedido' };
+        var paginaId = 'inicio', detQty = 1;
+
+        function todos() { return products.concat(games); }
+        function findItem(id) { return todos().find(function (p) { return p.id === id; }); }
+        function dto(p) { return p.originalPrice ? Math.round((1 - p.price / p.originalPrice) * 100) : 0; }
+        function estrellas(n) { return new Array(n + 1).join('<i class="fa-solid fa-star text-amber-400"></i>'); }
+        window.verProducto = function (id) { location.hash = '#/producto/' + id; };
+
+        function miniCard(p) {
+            var d = dto(p), juego = p.category === 'juegos', agotado = stockOf(p.id) <= 0;
+            return '<div class="mini-card glass-panel rounded-2xl p-4 border border-dark-border hover:border-brand-neon/60 transition-all hover:-translate-y-1 flex flex-col justify-between">' +
+                '<div class="cursor-pointer" onclick="verProducto(' + p.id + ')">' +
+                '<div class="relative h-40 rounded-xl bg-dark-bg/60 mb-3 overflow-hidden flex items-center justify-center">' +
+                '<img src="' + p.image + '" alt="' + p.name + '" class="h-full w-full ' + (juego ? 'object-cover' : 'object-contain p-2') + '">' +
+                (d ? '<span class="absolute top-2 left-2 bg-brand-pink text-white text-[10px] font-bold px-2 py-1 rounded-full">-' + d + '%</span>' : '') + '</div>' +
+                '<h3 class="font-bold text-white text-sm line-clamp-1">' + p.name + '</h3>' + stockBadge(p.id) + '</div>' +
+                '<div class="pt-3 mt-3 border-t border-dark-border/50 flex items-center justify-between">' +
+                '<div><span class="text-base font-bold font-orbitron text-brand-neon">' + money(p.price) + '</span>' +
+                (p.originalPrice ? '<span class="text-xs text-gray-500 line-through block">' + money(p.originalPrice) + '</span>' : '') + '</div>' +
+                '<button type="button" onclick="addToCart(' + p.id + ')" ' + (agotado ? 'disabled' : '') + ' class="disabled:opacity-40 disabled:cursor-not-allowed px-3 py-2 rounded-xl bg-dark-hover hover:bg-brand-500 border border-dark-border hover:border-brand-500 text-white text-xs font-semibold transition-all flex items-center gap-1.5"><i class="fa-solid fa-cart-plus"></i> Agregar</button>' +
+                '</div></div>';
+        }
+
+        function renderOfertas() {
+            var l = todos().filter(function (p) { return p.originalPrice; }).sort(function (a, b) { return dto(b) - dto(a); });
+            document.getElementById('ofertas-grid').innerHTML = l.map(miniCard).join('');
+        }
+        function tickOferta() {
+            var el = document.getElementById('oferta-timer'); if (!el) return;
+            var f = new Date(); f.setHours(23, 59, 59, 999);
+            var s = Math.max(0, Math.floor((f - new Date()) / 1000));
+            var p = function (n) { return String(n).padStart(2, '0'); };
+            el.textContent = p(Math.floor(s / 3600)) + ':' + p(Math.floor(s % 3600 / 60)) + ':' + p(s % 60);
+        }
+        setInterval(tickOferta, 1000); tickOferta();
+
+        window.detCambiar = function (id, d) {
+            detQty = Math.max(1, Math.min(Math.max(1, limitOf(id)), detQty + d));
+            document.getElementById('det-qty').textContent = detQty;
+        };
+        window.avisarme = function () { showToast('¡Listo! Te avisaremos cuando vuelva a haber stock.'); };
+        window.comprarAhora = function (id) { addToCart(id, detQty); toggleCart(); };
+
+        function renderDetalle(id) {
+            var p = findItem(id), s = stockOf(id), d = dto(p), juego = p.category === 'juegos';
+            var desc = p.description || (p.genre + ' · Versión para ' + p.platform + '. Juego original con entrega rápida.');
+            var etiqueta = juego ? p.platform : p.tag;
+            var inicial = STOCK_INICIAL[id] || 1;
+            var pct = Math.max(4, Math.min(100, Math.round(s / inicial * 100)));
+            var color = s <= 0 ? 'bg-red-500' : (s <= 3 ? 'bg-amber-400' : 'bg-emerald-400');
+            var padre = juego ? ['#/juegos', 'Juegos'] : ['#/catalogo', 'Catálogo'];
+            var rel = todos().filter(function (x) { return x.id !== id && x.category === p.category; });
+            if (rel.length < 4) rel = rel.concat(todos().filter(function (x) { return x.id !== id && x.category !== p.category; }));
+            detQty = 1;
+            document.getElementById('detalle').innerHTML =
+                '<nav class="text-xs text-gray-400 mb-6 flex flex-wrap gap-2 items-center" aria-label="Ruta"><a href="#/inicio" class="hover:text-brand-neon">Inicio</a><span>/</span><a href="' + padre[0] + '" class="hover:text-brand-neon">' + padre[1] + '</a><span>/</span><span class="text-gray-200">' + p.name + '</span></nav>' +
+                '<div class="grid grid-cols-1 lg:grid-cols-2 gap-10">' +
+                '<div class="glass-panel rounded-3xl border border-dark-border p-6 flex items-center justify-center min-h-[320px]"><img src="' + p.image + '" alt="' + p.name + '" class="max-h-[420px] w-full ' + (juego ? 'object-contain rounded-xl' : 'object-contain') + '"></div>' +
+                '<div class="space-y-5">' +
+                '<span class="inline-block text-[10px] font-bold px-3 py-1 rounded-full bg-brand-500/20 text-brand-neon uppercase tracking-wider">' + etiqueta + '</span>' +
+                '<h2 class="text-3xl font-extrabold font-orbitron text-white">' + p.name + '</h2>' +
+                '<div class="text-sm">' + estrellas(p.rating) + '</div>' +
+                '<p class="text-gray-300">' + desc + '</p>' +
+                '<div class="flex items-end gap-3"><span class="text-4xl font-extrabold font-orbitron text-brand-neon">' + money(p.price) + '</span>' +
+                (p.originalPrice ? '<span class="text-lg text-gray-500 line-through">' + money(p.originalPrice) + '</span><span class="px-2 py-1 rounded-full bg-brand-pink text-white text-xs font-bold">-' + d + '%</span>' : '') + '</div>' +
+                '<div><div class="flex justify-between text-xs text-gray-400 mb-1"><span>Disponibilidad</span><span>' + (s <= 0 ? 'Agotado' : s + ' unidad(es)') + '</span></div>' +
+                '<div class="h-2 rounded-full bg-dark-hover overflow-hidden"><div class="h-full ' + color + '" style="width:' + (s <= 0 ? 0 : pct) + '%"></div></div>' +
+                (s > 0 ? '<p class="text-xs text-gray-500 mt-2">Límite por pedido: ' + limitOf(id) + ' unidad(es).</p>' : '') + '</div>' +
+                (s > 0
+                    ? '<div class="flex flex-wrap items-center gap-3"><div class="flex items-center gap-3 px-3 py-2 rounded-xl bg-dark-card border border-dark-border"><button type="button" aria-label="Menos" onclick="detCambiar(' + id + ',-1)" class="w-7 h-7 rounded bg-dark-bg hover:bg-dark-hover text-gray-200">-</button><span id="det-qty" class="font-bold text-white w-5 text-center">1</span><button type="button" aria-label="Más" onclick="detCambiar(' + id + ',1)" class="w-7 h-7 rounded bg-dark-bg hover:bg-dark-hover text-gray-200">+</button></div>' +
+                      '<button type="button" onclick="addToCart(' + id + ',detQty)" class="px-6 py-3 rounded-xl bg-dark-hover hover:bg-brand-500 border border-dark-border hover:border-brand-500 text-white font-semibold text-sm transition-all"><i class="fa-solid fa-cart-plus mr-2"></i>Agregar</button>' +
+                      '<button type="button" onclick="comprarAhora(' + id + ')" class="px-6 py-3 rounded-xl bg-gradient-to-r from-brand-500 to-brand-600 text-white font-bold text-sm shadow-lg">Comprar ahora</button></div>'
+                    : '<button type="button" onclick="avisarme()" class="px-6 py-3 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 font-semibold text-sm"><i class="fa-solid fa-bell mr-2"></i>Avísame cuando haya stock</button>') +
+                '<ul class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-gray-300 pt-2"><li class="p-3 rounded-xl bg-dark-card border border-dark-border"><i class="fa-solid fa-truck-fast text-brand-neon mr-1"></i>Envío 24-48 h</li><li class="p-3 rounded-xl bg-dark-card border border-dark-border"><i class="fa-solid fa-shield-halved text-brand-purple mr-1"></i>12 meses de garantía</li><li class="p-3 rounded-xl bg-dark-card border border-dark-border"><i class="fa-solid fa-certificate text-amber-400 mr-1"></i>100% original</li></ul>' +
+                '</div></div>' +
+                '<h3 class="text-xl font-bold font-orbitron text-white mt-14 mb-5">También te puede interesar</h3>' +
+                '<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">' + rel.slice(0, 4).map(miniCard).join('') + '</div>';
+        }
+
+        var FAQ = [
+            ['¿Cuánto demora el envío?', 'Entregamos en todo el país en 24 a 48 horas laborables, con envío asegurado y gratuito en el envío estándar.'],
+            ['¿Qué significa "Solo quedan X"?', 'Trabajamos con stock limitado. Cuando quedan 3 unidades o menos lo avisamos, y si llega a 0 el producto aparece como Agotado.'],
+            ['¿Por qué no puedo agregar más unidades?', 'Hay un máximo de 5 unidades por producto en cada pedido, o el stock disponible si es menor. Así más gamers pueden comprar.'],
+            ['¿Cómo funciona la garantía?', 'Todos los productos incluyen 12 meses de garantía de fabricante contra defectos de fábrica. Guarda tu código de pedido como comprobante.'],
+            ['¿Qué formas de pago aceptan?', 'Tarjetas Visa y Mastercard (hasta 12 cuotas sin interés), Yape, Plin, PayPal, PagoEfectivo (código CIP) y transferencia bancaria. Todos los precios están en Soles (S/).'],
+            ['¿Puedo seguir mi pedido?', 'Sí. Con tu código GV-XXXXXX entra a Estado de mi pedido y revisa en qué etapa va.'],
+            ['¿Los productos son originales?', 'Sí, 100% originales y sellados, con garantía oficial.']
+        ];
+        document.getElementById('faq-list').innerHTML = FAQ.map(function (f) {
+            return '<details class="faq glass-panel rounded-2xl border border-dark-border px-5 py-4"><summary class="flex items-center justify-between gap-4 font-semibold text-white">' + f[0] + '<i class="fa-solid fa-chevron-down chev text-brand-neon text-xs"></i></summary><p class="text-sm text-gray-400 mt-3">' + f[1] + '</p></details>';
+        }).join('');
+
+        var ETAPAS = ['Pago confirmado', 'Preparando tu pedido', 'En camino', 'Entregado'];
+        function etapa(o) { var m = (Date.now() - o.fecha) / 60000; return m < 1 ? 0 : m < 3 ? 1 : m < 6 ? 2 : 3; }
+        function tarjetaPedido(o) {
+            var e = etapa(o);
+            var pasos = ETAPAS.map(function (t, i) {
+                return '<div class="flex flex-col items-center text-center gap-2 flex-1"><div class="step-dot ' + (i <= e ? 'done' : '') + '">' + (i <= e ? '<i class="fa-solid fa-check"></i>' : (i + 1)) + '</div><span class="text-[11px] ' + (i <= e ? 'text-white' : 'text-gray-500') + '">' + (i === 0 && o.pendiente && e === 0 ? 'Pago pendiente' : t) + '</span></div>';
+            }).join('');
+            return '<div class="glass-panel rounded-2xl border border-dark-border p-5"><div class="flex flex-wrap justify-between gap-2 mb-3"><span class="font-orbitron font-bold text-brand-neon">' + o.code + '</span><span class="text-xs text-gray-400">' + new Date(o.fecha).toLocaleString('es-PE') + '</span></div>' +
+                (window.metodoLinea ? window.metodoLinea(o) : '') + '<ul class="text-sm text-gray-300 mb-3 space-y-1">' + o.items.map(function (i) { return '<li>' + i.q + ' × ' + i.n + ' <span class="text-gray-500">— ' + money(i.p * i.q) + '</span></li>'; }).join('') + '</ul>' +
+                '<p class="text-sm text-white font-semibold mb-4">Total: ' + money(o.total) + '</p><div class="flex items-start">' + pasos + '</div>' +
+                '<p class="text-[11px] text-gray-500 mt-3">Seguimiento simulado para esta demo.</p></div>';
+        }
+        function renderPedidos() {
+            var l = leerLS('gv-pedidos') || [];
+            document.getElementById('pedido-result').innerHTML = l.length
+                ? '<h3 class="text-sm font-bold text-gray-300 uppercase tracking-wider">Tus compras recientes</h3>' + l.map(tarjetaPedido).join('')
+                : '<p class="text-center text-gray-400 py-8">Aún no tienes pedidos. <a href="#/catalogo" class="text-brand-neon hover:underline">Explora el catálogo</a>.</p>';
+        }
+        window.buscarPedido = function () {
+            var c = document.getElementById('pedido-code').value.trim().toUpperCase();
+            if (!c) { renderPedidos(); return; }
+            var o = (leerLS('gv-pedidos') || []).find(function (x) { return x.code === c; });
+            document.getElementById('pedido-result').innerHTML = o ? tarjetaPedido(o) : '<p class="text-center text-gray-400 py-8">No encontramos el pedido <b class="text-white">' + c + '</b>. Revisa el código e inténtalo de nuevo.</p>';
+        };
+
+        function route() {
+            var partes = location.hash.replace(/^#\/?/, '').split('/');
+            var pg = MAP[partes[0]] || 'inicio', arg = parseInt(partes[1], 10);
+            if (pg === 'producto' && !findItem(arg)) pg = 'catalogo';
+            paginaId = pg;
+            document.querySelectorAll('[data-page]').forEach(function (el) { el.classList.toggle('pg-hide', el.dataset.page !== pg); });
+            window.paginaActual = pg === 'producto' ? 'catalogo' : pg;
+            if (pg === 'ofertas') renderOfertas();
+            if (pg === 'producto') renderDetalle(arg);
+            if (pg === 'pedido') renderPedidos();
+            if (pg === 'catalogo') refreshCatalog();
+            var base = pg === 'producto' ? findItem(arg).name : TITULOS[pg];
+            document.title = (pg === 'inicio' ? 'GameVault | ' : base + ' | GameVault | ') + (pg === 'inicio' ? base : '').trim();
+            if (pg !== 'inicio') document.title = document.title.replace(/ \| $/, '');
+            document.getElementById('mobile-menu').classList.add('hidden');
+            window.scrollTo(0, 0);
+            window.dispatchEvent(new Event('scroll'));
+        }
+        window.refreshAll = function () {
+            refreshCatalog(); renderGames();
+            if (paginaId === 'ofertas') renderOfertas();
+            if (paginaId === 'producto') { var a = parseInt(location.hash.split('/')[2], 10); if (findItem(a)) renderDetalle(a); }
+            if (paginaId === 'pedido') renderPedidos();
+        };
+        window.addEventListener('hashchange', route);
+        route();
+    })();
+    </script>
+    <!-- Métodos de pago y checkout -->
+    <script>
+(function () {
+    // ===== Métodos de pago (simulación de pasarela: no se realiza ningún cobro real) =====
+    var PAGOS = {
+        tarjeta:       { n: 'Tarjeta',       i: 'fa-solid fa-credit-card',        c: 'text-brand-neon',  pend: false, btn: 'PAGAR',                    hint: 'Visa y Mastercard · hasta 12 cuotas sin interés.' },
+        yape:          { n: 'Yape',          i: 'fa-solid fa-mobile-screen-button', c: 'text-purple-400', pend: false, btn: 'YA YAPEÉ, CONFIRMAR',     hint: 'Escanea el QR o yapea al número de la tienda.' },
+        plin:          { n: 'Plin',          i: 'fa-solid fa-mobile-screen',      c: 'text-cyan-400',    pend: false, btn: 'YA PLINEÉ, CONFIRMAR',     hint: 'Paga desde la app de tu banco con Plin.' },
+        paypal:        { n: 'PayPal',        i: 'fa-brands fa-paypal',            c: 'text-blue-400',    pend: false, btn: 'CONTINUAR CON PAYPAL',     hint: 'Paga con tu cuenta PayPal o tarjeta vinculada.' },
+        pagoefectivo:  { n: 'PagoEfectivo',  i: 'fa-solid fa-money-bill-wave',    c: 'text-amber-400',   pend: true,  btn: 'GENERAR CÓDIGO CIP',       hint: 'Paga en efectivo en agentes, bodegas o banca por internet.' },
+        transferencia: { n: 'Transferencia', i: 'fa-solid fa-building-columns',   c: 'text-emerald-400', pend: true,  btn: 'YA TRANSFERÍ, CONFIRMAR',  hint: 'Transferencia desde cualquier banco. Validación en 24 h.' }
+    };
+    var BANCOS = [
+        ['BCP', 'Cuenta 000-0000000-0-00', 'CCI 002-000-000000000000-00'],
+        ['Interbank', 'Cuenta 000-0000000000', 'CCI 003-000-000000000000-00'],
+        ['BBVA', 'Cuenta 0011-0000-00-0000000000', 'CCI 011-000-000000000000-00']
+    ];
+    var payMethod = 'tarjeta';
+    var INP = 'w-full px-3 py-2.5 rounded-lg bg-dark-bg border border-dark-border text-white text-sm placeholder-gray-500 focus:outline-none focus:border-brand-neon';
+    var LBL = 'block text-xs font-semibold text-gray-300 uppercase mb-1';
+    var modal = document.getElementById('checkout-modal');
+    var body = document.getElementById('checkout-body');
+
+    function cartTotal() { return cart.reduce(function (s, i) { return s + i.price * i.quantity; }, 0); }
+    function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+
+    // --- Selector de método (carrito y modal comparten estado) ---
+    function tilesHTML() {
+        return Object.keys(PAGOS).map(function (k) {
+            var p = PAGOS[k];
+            return '<button type="button" role="radio" class="pay-tile" data-m="' + k + '" aria-checked="' + (k === payMethod) + '" onclick="setPay(\'' + k + '\')"><i class="' + p.i + ' ' + p.c + '"></i>' + p.n + '</button>';
+        }).join('');
+    }
+    function paintTiles() {
+        document.querySelectorAll('.pay-grid').forEach(function (g) {
+            if (!g.children.length) g.innerHTML = tilesHTML();
+            g.querySelectorAll('.pay-tile').forEach(function (b) { b.setAttribute('aria-checked', String(b.dataset.m === payMethod)); });
+        });
+        var h = document.getElementById('pay-hint');
+        if (h) h.textContent = PAGOS[payMethod].hint;
+    }
+    window.setPay = function (m) {
+        if (!PAGOS[m]) return;
+        payMethod = m; paintTiles();
+        if (!modal.classList.contains('hidden') && document.getElementById('pay-fields')) renderFields();
+    };
+
+    // --- QR demostrativo (no es un QR real de cobro) ---
+    function qrSVG(seed) {
+        var N = 21, s = seed || 7, r = '';
+        function rnd() { s = (s * 1103515245 + 12345) & 0x7fffffff; return s / 0x7fffffff; }
+        for (var y = 0; y < N; y++) for (var x = 0; x < N; x++) {
+            var on, zone = null;
+            if (x < 7 && y < 7) zone = [0, 0]; else if (x >= N - 7 && y < 7) zone = [N - 7, 0]; else if (x < 7 && y >= N - 7) zone = [0, N - 7];
+            if (zone) {
+                var lx = x - zone[0], ly = y - zone[1];
+                on = lx === 0 || lx === 6 || ly === 0 || ly === 6 || (lx >= 2 && lx <= 4 && ly >= 2 && ly <= 4);
+            } else if ((x < 8 && y < 8) || (x >= N - 8 && y < 8) || (x < 8 && y >= N - 8)) { on = false; }
+            else { on = rnd() > 0.52; }
+            if (on) r += '<rect x="' + x + '" y="' + y + '" width="1" height="1"/>';
+        }
+        return '<svg viewBox="-1 -1 23 23" width="150" height="150" shape-rendering="crispEdges" role="img" aria-label="Código QR demostrativo"><rect x="-1" y="-1" width="23" height="23" fill="#fff"/><g fill="#111">' + r + '</g></svg>';
+    }
+
+    // --- Campos por método ---
+    function renderFields() {
+        var box = document.getElementById('pay-fields'); if (!box) return;
+        var total = cartTotal(), m = payMethod, h = '';
+        if (m === 'tarjeta') {
+            var cuotas = [1, 3, 6, 12].map(function (n) {
+                return '<option value="' + n + '">' + (n === 1 ? 'Pago al contado · ' + money(total) : n + ' cuotas sin interés de ' + money(total / n) + ' c/u') + '</option>';
+            }).join('');
+            h = '<div><label class="' + LBL + '">Nombre en la tarjeta</label><input name="c_name" required autocomplete="cc-name" placeholder="Juan Pérez" class="' + INP + '"></div>' +
+                '<div><label class="' + LBL + '">Número de tarjeta <span id="card-brand" class="ml-2 normal-case text-base"></span></label><input name="c_num" required inputmode="numeric" autocomplete="cc-number" maxlength="19" oninput="payCard(this)" placeholder="4111 1111 1111 1111" class="' + INP + '"></div>' +
+                '<div class="grid grid-cols-2 gap-4"><div><label class="' + LBL + '">Vencimiento</label><input name="c_exp" required inputmode="numeric" autocomplete="cc-exp" maxlength="5" oninput="payExp(this)" placeholder="MM/AA" class="' + INP + '"></div>' +
+                '<div><label class="' + LBL + '">CVV</label><input name="c_cvv" required inputmode="numeric" autocomplete="cc-csc" maxlength="4" pattern="[0-9]{3,4}" placeholder="123" class="' + INP + '"></div></div>' +
+                '<div><label class="' + LBL + '">Cuotas</label><select name="c_cuotas" class="' + INP + '">' + cuotas + '</select></div>' +
+                '<p class="text-[11px] text-gray-500">Demostración: usa la tarjeta de prueba 4111 1111 1111 1111, una fecha futura y cualquier CVV. No se realiza ningún cobro.</p>';
+        } else if (m === 'yape' || m === 'plin') {
+            var nom = m === 'yape' ? 'Yape' : 'Plin', col = m === 'yape' ? '#742284' : '#00b7c3';
+            h = '<div class="flex flex-col sm:flex-row items-center gap-5 rounded-2xl bg-dark-bg/60 border border-dark-border p-4">' +
+                '<div class="rounded-2xl p-2 bg-white shrink-0" style="border:4px solid ' + col + '">' + qrSVG(Math.round(total) + (m === 'yape' ? 11 : 29)) + '</div>' +
+                '<ol class="text-sm text-gray-300 space-y-1.5 list-decimal list-inside"><li>Abre <b class="text-white">' + nom + '</b> y elige ' + (m === 'yape' ? 'Yapear / Escanear QR' : 'Pagar con QR o a un número') + '.</li>' +
+                '<li>Paga <b class="text-white">' + money(total) + '</b> al número <b class="text-white">+51 900 000 000</b> (GameVault).</li>' +
+                '<li>Escribe abajo el número de operación del comprobante.</li></ol></div>' +
+                '<div><label class="' + LBL + '">N° de operación</label><input name="p_op" required inputmode="numeric" pattern="[0-9]{6,10}" title="Entre 6 y 10 dígitos" placeholder="Ej. 12345678" class="' + INP + '"></div>' +
+                '<p class="text-[11px] text-gray-500">QR y número demostrativos: en esta versión de prueba no se procesa ningún pago real.</p>';
+        } else if (m === 'paypal') {
+            h = '<div><label class="' + LBL + '">Correo de tu cuenta PayPal</label><input name="p_mail" type="email" required autocomplete="email" placeholder="tuemail@correo.com" class="' + INP + '"></div>' +
+                '<div class="rounded-xl bg-blue-500/10 border border-blue-500/30 p-3 text-sm text-blue-200"><i class="fa-brands fa-paypal mr-2"></i>Te llevaremos a PayPal para autorizar el pago de <b class="text-white">' + money(total) + '</b> (simulado en esta demo).</div>';
+        } else if (m === 'pagoefectivo') {
+            h = '<div><label class="' + LBL + '">Correo para enviarte el código CIP</label><input name="p_mail" type="email" required autocomplete="email" placeholder="tuemail@correo.com" class="' + INP + '"></div>' +
+                '<div class="rounded-xl bg-amber-500/10 border border-amber-500/30 p-3 text-sm text-amber-200 space-y-1"><p><i class="fa-solid fa-circle-info mr-2"></i>Al confirmar generaremos tu <b class="text-white">código CIP</b>, válido por 48 horas.</p>' +
+                '<p class="text-xs text-amber-200/80">Págalo en agentes, bodegas o por banca por internet. Tu pedido queda reservado hasta que se confirme el pago.</p></div>';
+        } else if (m === 'transferencia') {
+            h = '<div class="rounded-2xl bg-dark-bg/60 border border-dark-border divide-y divide-dark-border text-sm">' +
+                BANCOS.map(function (b) { return '<div class="flex flex-wrap justify-between gap-x-4 px-4 py-3"><b class="text-white">' + b[0] + '</b><span class="text-gray-400">' + b[1] + ' · ' + b[2] + '</span></div>'; }).join('') +
+                '<div class="px-4 py-3 text-gray-300">Titular: <b class="text-white">GameVault S.A.C.</b> · Monto: <b class="text-brand-neon">' + money(total) + '</b></div></div>' +
+                '<div class="grid grid-cols-1 sm:grid-cols-2 gap-4"><div><label class="' + LBL + '">Banco de origen</label><select name="t_banco" class="' + INP + '"><option>BCP</option><option>Interbank</option><option>BBVA</option><option>Scotiabank</option><option>Otro</option></select></div>' +
+                '<div><label class="' + LBL + '">N° de operación</label><input name="p_op" required inputmode="numeric" pattern="[0-9]{6,12}" title="Entre 6 y 12 dígitos" placeholder="Ej. 00123456" class="' + INP + '"></div></div>' +
+                '<p class="text-[11px] text-gray-500">Datos bancarios de ejemplo. Validamos tu transferencia en un máximo de 24 horas hábiles.</p>';
+        }
+        box.innerHTML = h;
+        var btn = document.getElementById('pay-submit');
+        if (btn) btn.textContent = PAGOS[m].btn + (m === 'tarjeta' ? ' ' + money(total) : '');
+    }
+
+    // --- Formato de campos de tarjeta ---
+    function marca(d) {
+        if (/^4/.test(d)) return '<i class="fa-brands fa-cc-visa text-blue-400"></i>';
+        if (/^(5[1-5]|2[2-7])/.test(d)) return '<i class="fa-brands fa-cc-mastercard text-orange-400"></i>';
+        if (/^3[47]/.test(d)) return '<i class="fa-brands fa-cc-amex text-sky-400"></i>';
+        return '';
+    }
+    window.payCard = function (el) {
+        var d = el.value.replace(/\D/g, '').slice(0, 16);
+        el.value = d.replace(/(.{4})/g, '$1 ').trim();
+        var b = document.getElementById('card-brand'); if (b) b.innerHTML = marca(d);
+    };
+    window.payExp = function (el) {
+        var d = el.value.replace(/\D/g, '').slice(0, 4);
+        el.value = d.length > 2 ? d.slice(0, 2) + '/' + d.slice(2) : d;
+    };
+    function luhn(n) {
+        var s = 0, alt = false;
+        for (var k = n.length - 1; k >= 0; k--) { var d = +n[k]; if (alt) { d *= 2; if (d > 9) d -= 9; } s += d; alt = !alt; }
+        return n.length >= 13 && s % 10 === 0;
+    }
+    function expiraOk(v) {
+        var m = /^(\d{2})\/(\d{2})$/.exec(v); if (!m) return false;
+        var mes = +m[1], anio = 2000 + (+m[2]);
+        if (mes < 1 || mes > 12) return false;
+        return new Date(anio, mes, 0, 23, 59, 59) >= new Date();
+    }
+
+    // --- Modal de pago ---
+    function renderCheckout() {
+        var total = cartTotal();
+        var items = cart.map(function (i) {
+            return '<li class="flex justify-between gap-3"><span class="truncate">' + i.quantity + ' × ' + esc(i.name) + '</span><span class="text-gray-400 whitespace-nowrap">' + money(i.price * i.quantity) + '</span></li>';
+        }).join('');
+        body.innerHTML =
+            '<div class="text-center space-y-2 mb-6"><div class="w-12 h-12 rounded-full bg-brand-neon/10 border border-brand-neon/30 mx-auto flex items-center justify-center text-brand-neon text-xl"><i class="fa-solid fa-lock"></i></div>' +
+            '<h3 id="co-title" class="text-2xl font-bold font-orbitron text-white">Finalizar compra</h3>' +
+            '<p class="text-xs text-gray-400">Simulación de pasarela de pago · no se realiza ningún cobro real</p></div>' +
+            '<form id="pay-form" onsubmit="processPayment(event)" class="space-y-5">' +
+            '<div class="rounded-2xl bg-dark-bg/60 border border-dark-border p-4"><p class="' + LBL + '">Tu pedido</p><ul class="text-sm text-gray-200 space-y-1 max-h-28 overflow-y-auto">' + items + '</ul></div>' +
+            '<div><p class="' + LBL + '">Método de pago</p><div class="pay-grid grid grid-cols-3 sm:grid-cols-6 gap-2" role="radiogroup" aria-label="Método de pago"></div></div>' +
+            '<div id="pay-fields" class="space-y-4"></div>' +
+            '<div class="space-y-3"><p class="' + LBL + '">Datos de entrega</p>' +
+            '<input name="d_name" required autocomplete="name" placeholder="Nombre y apellido de quien recibe" class="' + INP + '">' +
+            '<div class="grid grid-cols-1 sm:grid-cols-2 gap-3"><input name="d_phone" required type="tel" autocomplete="tel" pattern="[0-9+ ]{9,15}" title="Celular de 9 dígitos" placeholder="Celular / WhatsApp" class="' + INP + '"><input name="d_city" required autocomplete="address-level2" placeholder="Distrito / Ciudad" class="' + INP + '"></div>' +
+            '<input name="d_addr" required autocomplete="street-address" placeholder="Dirección y referencia" class="' + INP + '"></div>' +
+            '<div class="pt-4 border-t border-dark-border flex flex-wrap items-center justify-between gap-4"><div><span class="block text-xs text-gray-400">Total a pagar:</span><span id="checkout-total-price" class="text-xl font-bold font-orbitron text-brand-neon">' + money(total) + '</span></div>' +
+            '<button type="submit" id="pay-submit" class="px-6 py-3 rounded-xl bg-gradient-to-r from-brand-neon to-brand-500 text-white font-bold font-orbitron text-sm hover:opacity-90"></button></div></form>';
+        paintTiles(); renderFields();
+    }
+    window.openCheckoutModal = function () {
+        if (!cart.length) { showToast('Tu carrito está vacío.'); return; }
+        toggleCart();
+        modal.classList.remove('hidden');
+        renderCheckout();
+    };
+    window.closeCheckoutModal = function () { modal.classList.add('hidden'); };
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !modal.classList.contains('hidden')) closeCheckoutModal(); });
+
+    window.processPayment = function (event) {
+        event.preventDefault();
+        if (!cart.length) return;
+        var f = event.target.elements, m = payMethod, total = cartTotal(), extra = {};
+        if (m === 'tarjeta') {
+            var num = f['c_num'].value.replace(/\s/g, '');
+            if (!luhn(num)) { showToast('El número de tarjeta no es válido.'); f['c_num'].focus(); return; }
+            if (!expiraOk(f['c_exp'].value)) { showToast('La fecha de vencimiento no es válida o ya venció.'); f['c_exp'].focus(); return; }
+            extra.cuotas = +f['c_cuotas'].value; extra.ultimos = num.slice(-4);
+        } else if (m === 'pagoefectivo') {
+            extra.cip = String(Math.floor(1e7 + Math.random() * 9e7)); extra.mail = f['p_mail'].value;
+        } else if (m === 'paypal') { extra.mail = f['p_mail'].value; }
+        else { extra.op = f['p_op'].value; }
+        var code = 'GV-' + Date.now().toString(36).toUpperCase().slice(-6);
+        var orden = {
+            code: code, fecha: Date.now(), total: total, metodo: m, pendiente: PAGOS[m].pend, extra: extra,
+            entrega: { n: f['d_name'].value, t: f['d_phone'].value, c: f['d_city'].value, d: f['d_addr'].value },
+            items: cart.map(function (i) { return { n: i.name, q: i.quantity, p: i.price }; })
+        };
+        guardarPedido(orden);
+        cart.forEach(function (i) { stock[i.id] = Math.max(0, stockOf(i.id) - i.quantity); });
+        saveStock();
+        cart = []; updateCartUI(); refreshAll();
+        confirmacion(orden);
+    };
+
+    function confirmacion(o) {
+        var p = PAGOS[o.metodo], x = o.extra || {}, panel = '';
+        if (o.metodo === 'pagoefectivo') {
+            var vence = new Date(Date.now() + 48 * 3600 * 1000).toLocaleString('es-PE');
+            panel = '<div class="text-center rounded-2xl border border-amber-400/40 bg-amber-500/10 p-4"><p class="text-xs text-amber-300 uppercase tracking-wider">Tu código de pago (CIP)</p><p class="font-orbitron text-3xl text-white tracking-widest my-1">' + x.cip + '</p><p class="text-xs text-gray-300">Págalo en agentes, bodegas o banca por internet antes del ' + vence + '.</p></div>';
+        } else if (o.metodo === 'transferencia') {
+            panel = '<div class="rounded-2xl border border-emerald-400/40 bg-emerald-500/10 p-4 text-sm text-emerald-100"><i class="fa-solid fa-hourglass-half mr-2"></i>Validaremos tu transferencia (operación N° ' + esc(x.op) + ') en un máximo de 24 horas hábiles.</div>';
+        } else if (o.metodo === 'yape' || o.metodo === 'plin') {
+            panel = '<p class="text-sm text-gray-300 text-center">Operación ' + p.n + ' N° <b class="text-white">' + esc(x.op) + '</b> registrada.</p>';
+        } else if (o.metodo === 'tarjeta') {
+            panel = '<p class="text-sm text-gray-300 text-center">Tarjeta terminada en <b class="text-white">' + x.ultimos + '</b> · ' + (x.cuotas > 1 ? x.cuotas + ' cuotas de ' + money(o.total / x.cuotas) : 'pago al contado') + '.</p>';
+        } else {
+            panel = '<p class="text-sm text-gray-300 text-center">Pago autorizado con PayPal (' + esc(x.mail) + ').</p>';
+        }
+        body.innerHTML =
+            '<div class="text-center space-y-4"><div class="w-16 h-16 rounded-full mx-auto flex items-center justify-center text-3xl ' + (o.pendiente ? 'bg-amber-500/15 text-amber-300 border border-amber-400/40' : 'bg-emerald-500/15 text-emerald-300 border border-emerald-400/40') + '"><i class="fa-solid ' + (o.pendiente ? 'fa-clock' : 'fa-check') + '"></i></div>' +
+            '<h3 id="co-title" class="text-2xl font-bold font-orbitron text-white">' + (o.pendiente ? '¡Pedido reservado!' : '¡Pago confirmado!') + '</h3>' +
+            '<div class="inline-block rounded-xl bg-dark-bg border border-dark-border px-5 py-3"><p class="text-[11px] text-gray-400 uppercase">Código de pedido</p><p class="font-orbitron text-xl text-brand-neon">' + o.code + '</p></div>' +
+            '<div class="flex flex-wrap justify-center gap-x-6 gap-y-1 text-sm text-gray-300"><span><i class="' + p.i + ' ' + p.c + ' mr-1.5"></i>' + p.n + '</span><span>Total: <b class="text-white">' + money(o.total) + '</b></span></div>' +
+            panel +
+            '<p class="text-xs text-gray-500">Enviaremos a ' + esc(o.entrega.d) + ', ' + esc(o.entrega.c) + '. Simulación: no se realizó ningún cobro real.</p>' +
+            '<div class="flex flex-col sm:flex-row gap-3 justify-center pt-2"><button type="button" onclick="closeCheckoutModal(); location.hash=\'#/pedido\'" class="px-6 py-3 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-semibold text-sm">Ver estado de mi pedido</button>' +
+            '<button type="button" onclick="closeCheckoutModal(); location.hash=\'#/catalogo\'" class="px-6 py-3 rounded-xl bg-dark-hover border border-dark-border hover:border-brand-neon text-white font-semibold text-sm">Seguir comprando</button></div></div>';
+        showToast('¡Pedido ' + o.code + ' registrado!');
+    }
+
+    // Línea con el método de pago para la pantalla "Estado de mi pedido"
+    window.metodoLinea = function (o) {
+        var p = PAGOS[o.metodo]; if (!p) return '';
+        var det = o.metodo === 'pagoefectivo' && o.extra && o.extra.cip ? ' · CIP ' + o.extra.cip : (o.metodo === 'tarjeta' && o.extra && o.extra.cuotas > 1 ? ' · ' + o.extra.cuotas + ' cuotas' : '');
+        return '<p class="text-xs text-gray-400 mb-3"><i class="' + p.i + ' ' + p.c + ' mr-1.5"></i>Pago con ' + p.n + det + (o.pendiente ? ' · <span class="text-amber-300">pendiente de confirmación</span>' : '') + '</p>';
+    };
+
+    paintTiles();
+})();
+    </script>
+    <!-- Guía en video -->
+    <script>
+(function () {
+    // ===== Videos de YouTube opcionales =====
+    // Pega aquí el ID del video (lo que va después de v= en la URL). Ejemplo: { id: 'dQw4w9WgXcQ', title: 'Título', desc: 'Descripción' }
+    var VIDEOS_YT = [];
+
+    // ===== Guía en video (reproductor propio con subtítulos y narración opcional) =====
+    var E = [
+        { t: 'Guía GameVault', sub: 'Consolas, mandos y accesorios', icon: 'fa-solid fa-gamepad', c: ['#6366f1', '#00f0ff'], nombre: 'Introducción',
+          pts: ['Elige según cómo y dónde juegas', 'Compara rendimiento, juegos y precio', 'Descubre los accesorios que sí valen la pena'], ref: null,
+          voz: 'Bienvenido a la guía de GameVault. Te mostraremos las consolas, mandos y accesorios de la tienda, para que elijas según cómo y dónde juegas.' },
+        { t: 'PlayStation 5 Slim', sub: 'La consola de los grandes exclusivos', icon: 'fa-brands fa-playstation', c: ['#0070d1', '#00f0ff'], nombre: 'PlayStation 5 Slim',
+          pts: ['SSD de 1 TB con cargas casi instantáneas', 'Hasta 4K a 120 fps con trazado de rayos', 'DualSense: vibración háptica y gatillos adaptativos', 'Ideal para God of War y Spider-Man'], ref: { p: 1 },
+          voz: 'La PlayStation 5 Slim trae un SSD de un terabyte, imagen de hasta 4K a 120 cuadros por segundo y el mando DualSense con vibración háptica. Es ideal para exclusivos como God of War y Spider-Man.' },
+        { t: 'Xbox Series X', sub: 'La Xbox más potente', icon: 'fa-brands fa-xbox', c: ['#107c10', '#a3e635'], nombre: 'Xbox Series X',
+          pts: ['Hasta 12 teraflops de potencia gráfica', '1 TB de SSD y 4K real', 'Quick Resume: retoma varios juegos al instante', 'Compatible con Game Pass (suscripción aparte)'], ref: { p: 3 },
+          voz: 'La Xbox Series X ofrece doce teraflops de potencia, un terabyte de almacenamiento y Quick Resume para retomar varios juegos al instante. Es compatible con Game Pass, que se contrata aparte.' },
+        { t: 'Nintendo Switch OLED', sub: 'Juega en casa o donde quieras', icon: 'fa-brands fa-nintendo-switch', c: ['#e60012', '#ffb300'], nombre: 'Switch OLED',
+          pts: ['Pantalla OLED de 7 pulgadas', 'Modo portátil, sobremesa y tablero', 'Joy-Con desmontables para jugar de a dos', 'Memoria ampliable con tarjeta microSD'], ref: { p: 5 },
+          voz: 'La Nintendo Switch OLED tiene pantalla de siete pulgadas y se juega en modo portátil, en la tele o sobre la mesa. Sus Joy-Con se separan para jugar de a dos, y su memoria se amplía con microSD.' },
+        { t: 'DualSense Edge', sub: 'El mando pro de PS5', icon: 'fa-solid fa-gamepad', c: ['#00f0ff', '#6366f1'], nombre: 'DualSense Edge',
+          pts: ['Botones traseros asignables', 'Sticks intercambiables y gatillos ajustables', 'Perfiles de configuración a un toque', 'Incluye estuche y cable trenzado'], ref: { p: 2 },
+          voz: 'El DualSense Edge es el mando profesional de PS5. Tiene botones traseros asignables, sticks intercambiables, gatillos ajustables y perfiles que cambias con un toque. Incluye estuche y cable trenzado.' },
+        { t: 'Xbox Elite Series 2 Core', sub: 'Precisión para competir', icon: 'fa-solid fa-gamepad', c: ['#8a2be2', '#ff007f'], nombre: 'Xbox Elite Series 2',
+          pts: ['Tensión de los sticks ajustable', 'Gatillos con topes de recorrido corto', 'Hasta 40 horas de batería', 'Botones y perfiles personalizables en la app'], ref: { p: 4 },
+          voz: 'El mando Xbox Elite Series 2 Core permite ajustar la tensión de los sticks y acortar el recorrido de los gatillos. Ofrece hasta cuarenta horas de batería y perfiles personalizables.' },
+        { t: 'Pro Controller', sub: 'El mando clásico de Switch', icon: 'fa-solid fa-gamepad', c: ['#3b82f6', '#00f0ff'], nombre: 'Pro Controller Switch',
+          pts: ['Ergonómico para sesiones largas', 'Vibración HD y giroscopio', 'Compatible con Switch y Switch OLED', 'Gran autonomía de batería'], ref: { p: 6 },
+          voz: 'El Pro Controller de Switch es ergonómico, con vibración HD y giroscopio. Es perfecto para sesiones largas y funciona con Switch y Switch OLED.' },
+        { t: 'Accesorios imprescindibles', sub: 'Mejora tu setup', icon: 'fa-solid fa-headset', c: ['#ff007f', '#ffb300'], nombre: 'Accesorios',
+          pts: ['SSD M.2 con disipador para ampliar tu PS5', 'MicroSD para tu Switch', 'Cable HDMI 2.1 para 4K a 120 Hz', 'Base de carga: mandos listos siempre'], ref: { cat: 'accesorios' },
+          voz: 'Completa tu equipo con accesorios: un SSD con disipador para ampliar tu PS5, una tarjeta microSD para la Switch, un cable HDMI 2.1 para 4K a 120 hertz y una base de carga para tus mandos.' },
+        { t: 'Compra fácil y segura', sub: 'Pagos, envío y garantía', icon: 'fa-solid fa-shield-halved', c: ['#6366f1', '#ff007f'], nombre: 'Compra segura',
+          pts: ['Tarjeta, Yape, Plin, PayPal, PagoEfectivo o transferencia', 'Envío en 24 a 48 horas', '12 meses de garantía', 'Hasta 12 cuotas sin interés con tarjeta'], ref: { hash: '#/catalogo' },
+          voz: 'En GameVault puedes pagar con tarjeta, Yape, Plin, PayPal, PagoEfectivo o transferencia. Entregamos en veinticuatro a cuarenta y ocho horas y todos los productos tienen doce meses de garantía.' }
+    ];
+    var BASE = 9000, CAP = 26000;
+    var i = 0, t = 0, playing = false, started = false, ended = false, voz = false, speaking = false, token = 0, timer = null;
+    function $(id) { return document.getElementById(id); }
+    var stage = $('vp-stage'), scene = $('vp-scene'), big = $('vp-big'), segsBox = $('vp-segs'), chapsBox = $('vp-chaps');
+    var btnPlay = $('vp-play'), btnPrev = $('vp-prev'), btnNext = $('vp-next'), btnVoz = $('vp-voz'), label = $('vp-label');
+    var TTS = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+    if (!TTS) { btnVoz.disabled = true; btnVoz.classList.add('opacity-50', 'cursor-not-allowed'); btnVoz.title = 'Tu navegador no admite narración por voz'; }
+
+    // Segmentos y capítulos
+    segsBox.innerHTML = E.map(function (e, k) { return '<button type="button" class="vp-seg" data-k="' + k + '" aria-label="Ir al capítulo ' + (k + 1) + ': ' + e.nombre + '"><i></i></button>'; }).join('');
+    chapsBox.innerHTML = E.map(function (e, k) { return '<button type="button" class="vp-chap" data-k="' + k + '"><span class="w-7 h-7 shrink-0 rounded-full bg-dark-hover flex items-center justify-center text-xs font-bold">' + (k + 1) + '</span><span>' + e.nombre + '</span></button>'; }).join('');
+    segsBox.addEventListener('click', function (ev) { var b = ev.target.closest('.vp-seg'); if (b) jump(+b.dataset.k); });
+    chapsBox.addEventListener('click', function (ev) { var b = ev.target.closest('.vp-chap'); if (b) jump(+b.dataset.k); });
+
+    function renderScene() {
+        var e = E[i];
+        stage.style.background = 'radial-gradient(ellipse at 20% 20%, ' + e.c[0] + '55, transparent 60%), radial-gradient(ellipse at 90% 90%, ' + e.c[1] + '33, transparent 55%), #0a0d14';
+        var link = e.ref ? '<button type="button" onclick="vpLink(' + i + ')" class="mt-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-semibold">Ver ' + (e.ref.p ? 'este producto' : 'más') + ' <i class="fa-solid fa-arrow-right ml-1"></i></button>' : '';
+        scene.innerHTML =
+            '<div class="sm:col-span-2 flex justify-center"><div class="vp-icon w-28 h-28 sm:w-44 sm:h-44 rounded-full flex items-center justify-center text-5xl sm:text-7xl text-white" style="background:linear-gradient(135deg,' + e.c[0] + ',' + e.c[1] + ');box-shadow:0 0 60px ' + e.c[0] + '88"><i class="' + e.icon + '"></i></div></div>' +
+            '<div class="sm:col-span-3 space-y-2 sm:space-y-3 w-full"><p class="text-xs uppercase tracking-widest text-brand-neon">Capítulo ' + (i + 1) + ' de ' + E.length + '</p>' +
+            '<h3 class="font-orbitron text-2xl sm:text-3xl font-black text-white leading-tight">' + e.t + '</h3><p class="text-sm text-gray-300">' + e.sub + '</p>' +
+            '<ul class="space-y-1.5 text-sm sm:text-base text-gray-100">' + e.pts.map(function (p, k) { return '<li class="vp-pt flex gap-2" style="animation-delay:' + (0.5 + k * 0.9) + 's"><i class="fa-solid fa-circle-check text-brand-neon mt-1 text-sm"></i><span>' + p + '</span></li>'; }).join('') + '</ul>' + link + '</div>';
+        chapsBox.querySelectorAll('.vp-chap').forEach(function (b) { b.setAttribute('aria-current', String(+b.dataset.k === i)); });
+        label.textContent = 'Capítulo ' + (i + 1) + ' de ' + E.length + ' · ' + E[i].nombre;
+    }
+    function paint() {
+        segsBox.querySelectorAll('.vp-seg').forEach(function (b) {
+            var k = +b.dataset.k;
+            b.firstChild.style.width = (k < i ? 100 : k === i ? Math.min(100, t / BASE * 100) : 0) + '%';
+        });
+        var pl = playing;
+        btnPlay.innerHTML = '<i class="fa-solid fa-' + (pl ? 'pause' : 'play') + '"></i>';
+        btnPlay.setAttribute('aria-label', pl ? 'Pausar' : 'Reproducir');
+        var showBig = !started || ended;
+        big.style.display = showBig ? 'flex' : 'none';
+        $('vp-big-ic').className = 'fa-solid fa-' + (ended ? 'rotate-right' : 'play') + (ended ? '' : ' ml-1');
+        $('vp-big-tx').textContent = ended ? 'VOLVER A VER' : 'VER GUÍA';
+        big.setAttribute('aria-label', ended ? 'Volver a ver el video' : 'Reproducir video');
+    }
+
+    // Narración (opcional)
+    function stopVoice() { token++; speaking = false; if (TTS) speechSynthesis.cancel(); }
+    function speak() {
+        if (!voz || !TTS) { speaking = false; return; }
+        stopVoice();
+        var my = token, u = new SpeechSynthesisUtterance(E[i].voz);
+        u.lang = 'es-ES';
+        var vs = speechSynthesis.getVoices().filter(function (v) { return /^es/i.test(v.lang); });
+        if (vs.length) u.voice = vs[0];
+        u.onend = u.onerror = function () { if (my === token) speaking = false; };
+        speaking = true;
+        speechSynthesis.speak(u);
+    }
+
+    function go(n, autoPlay) {
+        i = Math.max(0, Math.min(E.length - 1, n)); t = 0; ended = false;
+        stopVoice(); renderScene(); paint();
+        if (autoPlay && playing) speak();
+    }
+    function jump(n) { started = true; playing = true; go(n, true); paint(); }
+    function play() {
+        if (ended) { i = 0; }
+        started = true; ended = false; playing = true;
+        if (!timer) timer = setInterval(tick, 100);
+        if (ended || t === 0) { renderScene(); }
+        speak(); paint();
+    }
+    function pause() { playing = false; stopVoice(); paint(); }
+    function tick() {
+        if (!playing) return;
+        t += 100;
+        var fin = voz ? ((t >= BASE && !speaking) || t >= CAP) : t >= BASE;
+        if (fin) {
+            if (i < E.length - 1) { go(i + 1, true); }
+            else { playing = false; ended = true; stopVoice(); paint(); }
+        } else if (t % 300 === 0) { paint(); }
+    }
+
+    big.addEventListener('click', function () { if (ended) { i = 0; t = 0; renderScene(); } play(); });
+    btnPlay.addEventListener('click', function () { playing ? pause() : play(); });
+    btnPrev.addEventListener('click', function () { jump(i - 1); });
+    btnNext.addEventListener('click', function () { jump(i + 1); });
+    btnVoz.addEventListener('click', function () {
+        if (!TTS) return;
+        voz = !voz;
+        btnVoz.setAttribute('aria-pressed', String(voz));
+        btnVoz.innerHTML = '<i class="fa-solid fa-volume-' + (voz ? 'high' : 'xmark') + ' mr-1.5"></i>Narración: ' + (voz ? 'sí' : 'no');
+        if (voz && playing) speak(); else stopVoice();
+    });
+    stage.addEventListener('keydown', function (ev) {
+        if (ev.key === ' ' || ev.key.toLowerCase() === 'k') { ev.preventDefault(); playing ? pause() : play(); }
+        else if (ev.key === 'ArrowRight') { ev.preventDefault(); jump(i + 1); }
+        else if (ev.key === 'ArrowLeft') { ev.preventDefault(); jump(i - 1); }
+    });
+    window.vpLink = function (k) {
+        var r = E[k].ref; if (!r) return;
+        pause();
+        if (r.p) verProducto(r.p); else if (r.cat) goToCategory(r.cat); else if (r.hash) location.hash = r.hash;
+    };
+    function fueraDeVideos() { if (location.hash.indexOf('#/videos') !== 0 && playing) pause(); }
+    window.addEventListener('hashchange', fueraDeVideos);
+    document.addEventListener('visibilitychange', function () { if (document.hidden && playing) pause(); });
+
+    renderScene(); paint();
+
+    // ===== YouTube opcional (carga el reproductor solo al hacer clic) =====
+    if (VIDEOS_YT.length) {
+        $('yt-extra').classList.remove('hidden');
+        $('yt-grid').innerHTML = VIDEOS_YT.map(function (v, k) {
+            return '<div class="glass-panel rounded-2xl border border-dark-border overflow-hidden"><div class="relative aspect-video bg-black" id="yt-' + k + '"><button type="button" class="absolute inset-0 w-full h-full group" onclick="ytCargar(' + k + ')" aria-label="Reproducir: ' + v.title + '"><img src="https://i.ytimg.com/vi/' + v.id + '/hqdefault.jpg" alt="" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"><span class="absolute inset-0 flex items-center justify-center"><span class="w-16 h-16 rounded-full bg-brand-pink text-white flex items-center justify-center text-2xl"><i class="fa-solid fa-play ml-1"></i></span></span></button></div><div class="p-4"><h4 class="font-bold text-white text-sm">' + v.title + '</h4><p class="text-xs text-gray-400 mt-1">' + (v.desc || '') + '</p></div></div>';
+        }).join('');
+        window.ytCargar = function (k) {
+            $('yt-' + k).innerHTML = '<iframe class="absolute inset-0 w-full h-full" src="https://www.youtube-nocookie.com/embed/' + VIDEOS_YT[k].id + '?autoplay=1&rel=0" title="' + VIDEOS_YT[k].title + '" allow="accelerometer; autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>';
+        };
+    }
+})();
+    </script>
+</body>
+</html>
